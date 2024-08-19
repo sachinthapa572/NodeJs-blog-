@@ -20,21 +20,25 @@
 
     <main>
         <div class="blog-container">
-            <%= data.dataValues.title %>
+           <h1> <%= data.dataValues.title %></h1>
                 <p class="blog-meta">
                     <%= data.dataValues.createdAt %>
-
                 </p>
+
                 <div class="blog-image">
                     <img src="/test.png" alt="Web Development Journey">
                 </div>
+                <p>
+                    <%= data.dataValues.subtitle %>
+                </p>
                 <div class="blog-content">
                     <p>
                         <%= data.dataValues.description %>
                     </p>
                 </div>
                 <a href="/deletepost/<%= data.dataValues.id %>"><button>Delete</button></a>
-                
+                <a href="/editpost/<%= data.dataValues.id %>"><button>Update</button></a>
+
         </div>
     </main>
 

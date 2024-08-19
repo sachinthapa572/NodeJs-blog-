@@ -45,7 +45,6 @@ app.get('/blog/:id', async (req, res) => { // :id denote the dynamic data
 });
 
 // delete the post
-
 app.get('/deletepost/:id' , async (req , res ) => {
 
   const id = req.params.id; 
@@ -74,6 +73,34 @@ app.post('/addpost', async (req, res) => {
   // res.send('sucess');
   res.redirect('/'); // redirect to the given page
 });
+
+// edit post 
+
+app.get('/editpost/:id' ,async (req,res)=> {
+   const id = req.params.id
+   const [data] = await blog.findAll({
+    where:{
+      id:id
+    }
+  })
+   res.render("EditBlog" , {
+    data
+   })
+})
+
+app.post('/updatepost/:id' ,async (req,res)=> {
+  const id  = req.params.id
+  // const { title, subtitle, description } = req.body;
+
+  await blog.update(req.body , {
+    where:{
+      id:id
+    }
+  })
+
+  res.redirect('/blog/'+id)
+    
+})
 
 const PORT = 3000;
 app.listen(PORT, () => {
