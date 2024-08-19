@@ -70,3 +70,21 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 40px;
+    grid-template-rows: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.truncate {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Number of lines to display */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

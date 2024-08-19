@@ -23,6 +23,7 @@ db.sequelize = sequelize;
 db.blog = require('./Blogmodel.js')(sequelize, DataTypes);
 db.user = require('./UserModel.js')(sequelize, DataTypes);
 
+
 // to make any change to the db schema make it true and default let it be false
 db.sequelize.sync({ force: false }).then(() => {
   console.log('re-sync done');

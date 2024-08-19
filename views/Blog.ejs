@@ -19,16 +19,25 @@
     </nav>
 
     <main>
-        <div class="card">
-            <h2>Card Title</h2>
-            <h3>Card Subtitle</h3>
-            <p>This is a description of the card content.</p>
+        <div class="container">
+            <% if (data && data.length> 0) { %>
+                <% data.forEach(blog=> { %>
+                    <div class="card">
+                        <h2>
+                            <%= blog.dataValues.title %>
+                        </h2>
+                        <h3>
+                            <%= blog.dataValues.subtitle %>
+                        </h3>
+                        <p class="truncate">
+                            <%= blog.dataValues.description %>
+                        </p>
+                    </div>
+                    <% }) %>
         </div>
-        <div class="card">
-            <h2>Another Title</h2>
-            <h3>Another Subtitle</h3>
-            <p>This is another description of the card content.</p>
-        </div>
+        <% } else { %>
+            <p>No blogs available.</p>
+            <% } %>
     </main>
 
     <footer>
