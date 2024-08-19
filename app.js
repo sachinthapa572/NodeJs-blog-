@@ -1,5 +1,7 @@
 const express = require('express');
 const { blog } = require('./model/index');
+const { where } = require('sequelize');
+
 const app = express();
 
 // ejs lai setup
@@ -11,21 +13,51 @@ app.use(express.urlencoded({ extended: true }));
 
 //  static file ko lagi
 app.use(express.static('public/css'));
+app.use(express.static('public/images'));
 
-// read the database from the table
+// Home page && read the database from the table
 app.get('/', async (req, res) => {
   const data = await blog.findAll();
-  
-
   res.render('Blog', {
     data
   });
-  // res.send('Hello World');
 });
 
+// create blog page
 app.get('/createblog', (req, res) => {
   res.render('createblog');
 });
+
+// single blog page
+app.get('/blog/:id', async (req, res) => { // :id denote the dynamic data 
+  console.log(req.params.id);   // to get the :id value 
+  const id = req.params.id
+
+  const [data] = await blog.findAll({
+    where:{
+      id:id
+    }
+  })
+  res.render('SingleBlog' , {
+    data
+  });
+
+});
+
+// delete the post
+
+app.get('/deletepost/:id' , async (req , res ) => {
+
+  const id = req.params.id; 
+  console.log(id);
+  await blog.destroy({
+    where:{
+      id:id
+    }
+  })
+
+  res.redirect('/')
+})
 
 // add the post in the database
 app.post('/addpost', async (req, res) => {

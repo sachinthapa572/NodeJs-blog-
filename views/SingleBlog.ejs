@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Journey of Web Development - Your Website</title>
+    <link rel="stylesheet" href="/singleblog.css">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/createblog">ADD BLOG</a></li>
+            <li><a href="#">Sign In</a></li>
+            <li><a href="#">Sign Up</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="blog-container">
+            <%= data.dataValues.title %>
+                <p class="blog-meta">
+                    <%= data.dataValues.createdAt %>
+
+                </p>
+                <div class="blog-image">
+                    <img src="/test.png" alt="Web Development Journey">
+                </div>
+                <div class="blog-content">
+                    <p>
+                        <%= data.dataValues.description %>
+                    </p>
+                </div>
+                <a href="/deletepost/<%= data.dataValues.id %>"><button>Delete</button></a>
+                
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Your Website. All Rights Reserved.</p>
+    </footer>
+</body>
+
+</html>
