@@ -9,41 +9,32 @@
 </head>
 
 <body>
-    <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/createblog">ADD BLOG</a></li>
-            <li><a href="#">Sign In</a></li>
-            <li><a href="#">Sign Up</a></li>
-        </ul>
-    </nav>
+    <%- include('./components/navbar') %>
 
-    <main>
-        <div class="container">
-            <% if (data && data.length> 0) { %>
-                <% data.forEach(blog=> { %>
-                    <div class="card">
-                        <h2>
-                            <%= blog.dataValues.title %>
-                        </h2>
-                        <h3>
-                            <%= blog.dataValues.subtitle %>
-                        </h3>
-                        <p class="truncate">
-                            <%= blog.dataValues.description %>
-                        </p>
-                        <a href="/blog/<%= blog.dataValues.id %>"><button>Read More</button></a>
-                    </div>
-                    <% }) %>
-        </div>
-        <% } else { %>
-            <p>No blogs available.</p>
-            <% } %>
-    </main>
+        <main>
+            <div class="container">
+                <% if (data && data.length> 0) { %>
+                    <% data.forEach(blog=> { %>
+                        <div class="card">
+                            <h2>
+                                <%= blog.dataValues.title %>
+                            </h2>
+                            <h3>
+                                <%= blog.dataValues.subtitle %>
+                            </h3>
+                            <p class="truncate">
+                                <%= blog.dataValues.description %>
+                            </p>
+                            <a href="/blog/<%= blog.dataValues.id %>"><button>Read More</button></a>
+                        </div>
+                        <% }) %>
+            </div>
+            <% } else { %>
+                <p>No blogs available.</p>
+                <% } %>
+        </main>
 
-    <footer>
-        <p>&copy; 2024 Your Website. All Rights Reserved.</p>
-    </footer>
+        <%- include('./components/Footer') %>
 </body>
 
 </html>

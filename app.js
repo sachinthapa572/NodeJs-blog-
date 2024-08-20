@@ -1,6 +1,9 @@
 const express = require('express');
-const { blog } = require('./model/index');
+const { blog, user } = require('./model/index');
 const { where } = require('sequelize');
+const bcrypt = require('bcrypt')
+const blog = require('./routes/BlogRoute');
+const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost, signupUser, loginPage, loginUser, signupPage } = require('./controller/blog/blogController');
 
 const app = express();
 
@@ -15,92 +18,45 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public/css'));
 app.use(express.static('public/images'));
 
+
 // Home page && read the database from the table
-app.get('/', async (req, res) => {
-  const data = await blog.findAll();
-  res.render('Blog', {
-    data
-  });
-});
+app.get('/',homePage);
 
 // create blog page
-app.get('/createblog', (req, res) => {
-  res.render('createblog');
-});
+app.get('/createblog',createPost);
 
 // single blog page
-app.get('/blog/:id', async (req, res) => { // :id denote the dynamic data 
-  console.log(req.params.id);   // to get the :id value 
-  const id = req.params.id
-
-  const [data] = await blog.findAll({
-    where:{
-      id:id
-    }
-  })
-  res.render('SingleBlog' , {
-    data
-  });
-
-});
-
-// delete the post
-app.get('/deletepost/:id' , async (req , res ) => {
-
-  const id = req.params.id; 
-  console.log(id);
-  await blog.destroy({
-    where:{
-      id:id
-    }
-  })
-
-  res.redirect('/')
-})
+app.get('/blog/:id',singleBlog);
 
 // add the post in the database
-app.post('/addpost', async (req, res) => {
-  console.log(req.body);
+app.post('/addpost',addPost);
 
-  const { title, subtitle, description } = req.body;
+// delete the post
+app.get('/deletepost/:id' ,deletePost)
 
-  blog.create({
-    title,
-    subtitle,
-    description,
-  });
-
-  // res.send('sucess');
-  res.redirect('/'); // redirect to the given page
-});
 
 // edit post 
 
-app.get('/editpost/:id' ,async (req,res)=> {
-   const id = req.params.id
-   const [data] = await blog.findAll({
-    where:{
-      id:id
-    }
-  })
-   res.render("EditBlog" , {
-    data
-   })
-})
+app.get('/editpost/:id' ,editPost)
 
-app.post('/updatepost/:id' ,async (req,res)=> {
-  const id  = req.params.id
-  // const { title, subtitle, description } = req.body;
+// update the post 
+app.post('/updatepost/:id' ,updatePost)
 
-  await blog.update(req.body , {
-    where:{
-      id:id
-    }
-  })
+// signup page 
 
-  res.redirect('/blog/'+id)
-    
-})
+app.get('/signuppage',signupPage)
+
+// signup user data 
+app.post('/signupuser',signupUser );
+
+// login page
+app.get('/loginpage',loginPage)
+
+
+//login user 
+
+app.post('/loginuser',loginUser );
+
 
 const PORT = 3000;
 app.listen(PORT, () => {
