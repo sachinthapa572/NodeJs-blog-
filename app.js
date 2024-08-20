@@ -2,10 +2,14 @@ const express = require('express');
 const { blog, user } = require('./model/index');
 const { where } = require('sequelize');
 const bcrypt = require('bcrypt')
-const blog = require('./routes/BlogRoute');
+
 const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost, signupUser, loginPage, loginUser, signupPage } = require('./controller/blog/blogController');
+const blogRoute = require('./routes/BlogRoute');
 
 const app = express();
+
+// setting of the routes
+app.use('/', blogRoute);
 
 // ejs lai setup
 app.set('view engine', 'ejs');
@@ -19,43 +23,45 @@ app.use(express.static('public/css'));
 app.use(express.static('public/images'));
 
 
-// Home page && read the database from the table
-app.get('/',homePage);
-
-// create blog page
-app.get('/createblog',createPost);
-
-// single blog page
-app.get('/blog/:id',singleBlog);
-
-// add the post in the database
-app.post('/addpost',addPost);
-
-// delete the post
-app.get('/deletepost/:id' ,deletePost)
 
 
-// edit post 
+// // Home page && read the database from the table
+// app.get('/',homePage);
 
-app.get('/editpost/:id' ,editPost)
+// // create blog page
+// app.get('/createblog',createPost);
 
-// update the post 
-app.post('/updatepost/:id' ,updatePost)
+// // single blog page
+// app.get('/blog/:id',singleBlog);
 
-// signup page 
+// // add the post in the database
+// app.post('/addpost',addPost);
 
-app.get('/signuppage',signupPage)
-
-// signup user data 
-app.post('/signupuser',signupUser );
-
-// login page
-app.get('/loginpage',loginPage)
+// // delete the post
+// app.get('/deletepost/:id' ,deletePost)
 
 
-//login user 
+// // edit post 
 
-app.post('/loginuser',loginUser );
+// app.get('/editpost/:id' ,editPost)
+
+// // update the post 
+// app.post('/updatepost/:id' ,updatePost)
+
+// // signup page 
+
+// app.get('/signuppage',signupPage)
+
+// // signup user data 
+// app.post('/signupuser',signupUser );
+
+// // login page
+// app.get('/loginpage',loginPage)
+
+
+// //login user 
+
+// app.post('/loginuser',loginUser );
 
 
 const PORT = 3000;

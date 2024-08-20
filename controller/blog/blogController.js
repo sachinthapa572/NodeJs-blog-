@@ -1,3 +1,6 @@
+const { blog, user } = require("../../model");
+
+
 // Home page && read the database from the table
 exports.homePage = async (req, res) => {
     const data = await blog.findAll();
@@ -29,7 +32,7 @@ exports.singleBlog = async (req, res) => { // :id denote the dynamic data
 
 // add the post in the database
 exports.addPost= async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
   
     const { title, subtitle, description } = req.body;
   
@@ -89,6 +92,9 @@ exports.updatePost = async (req,res)=> {
       
   }
 
+
+//! User Authentication
+
 // signup page 
 exports.signupPage = (req,res)=> {
     res.render('signup') 
@@ -115,11 +121,9 @@ exports.signupUser = async (req, res) => {
             email,
             password: newpassword
         });
-  
-        // Redirect to home page after successful registration
         res.render('login');
     } catch (error) {
-        // Handle potential errors
+    
         console.error('Error:', error);
         res.render('signup', {
             error: "An error occurred during registration. Please try again."
@@ -127,10 +131,10 @@ exports.signupUser = async (req, res) => {
     }
   }
 
-// login
+// login page 
 
 exports.loginPage = (req,res)=> {
-    res.render('login' , { error: null }) 
+    res.render('login') 
   }
 
 // login user
