@@ -43,16 +43,25 @@ exports.singleBlog = async (req, res) => { // :id denote the dynamic data
 exports.addPost = async (req, res) => {
   // console.log(req.body);
   // console.log(req.users);
+  console.log(req.file);    // file haru req.body ma aauna so use req.file
+
 
   const { title, subtitle, description } = req.body;
-  const userId = req.users
+  const userId = req.users          // isAuthmiddelware le pass gare ko value 
+  const image = `http://localhost:3000/${req.file.filename}`
+
+  //* flash use hanerw milauna parcha 
+  if (!(title || subtitle || description || image)) {
+    return res.send("Enter the all fied 💕")
+  }
 
 
   blog.create({
     title,
     subtitle,
     description,
-    userId
+    userId,
+    image
   });
 
   // res.send('sucess');

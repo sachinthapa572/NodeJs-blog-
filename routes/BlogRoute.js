@@ -2,11 +2,15 @@ const router = require('express').Router();
 
 const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost, showMyBlog } = require('../controller/blog/blogController');
 const { signupPage, signupUser, loginPage, loginUser } = require('../controller/auth/authController');
-const { isAuth } = require('../middelware/isAuth');
+const { isAuth } = require('../middleware/isAuth.middleware');
+// multer  config 
+const { multer, storage } = require('../middleware/multer.middleware')
+const upload = multer({ storage: storage })
 
-router.route('/').get(isAuth, homePage);
+
+router.route('/').get(homePage);
 router.route('/createblog').get(isAuth, createPost);            // isAuth is the middelware
-router.route('/addpost').post(isAuth, addPost);
+router.route('/addpost').post(isAuth, upload.single("image"), addPost);
 router.route('/blog/:id').get(singleBlog);
 router.route('/deletepost/:id').get(isAuth, deletePost);
 router.route('/editpost/:id').get(isAuth, editPost);

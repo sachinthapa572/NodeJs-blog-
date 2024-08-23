@@ -27,7 +27,7 @@ app.use('', blogRoute);  // localhost:3000/ + blogRoute
 
 //!  static file ko lagi
 app.use(express.static('public/css'));
-app.use(express.static('public/images'));
+app.use(express.static('uploads/'));
 
 
 const PORT = process.env.PORT || 3001;
