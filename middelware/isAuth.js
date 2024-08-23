@@ -10,7 +10,7 @@ exports.isAuth = async (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token)
-        return res.send("Token must be sent ")
+        return res.redirect('/loginpage')
 
     //! token verification 
 

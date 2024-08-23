@@ -1,9 +1,15 @@
-const { blog } = require("../../model");
+const { blog, user } = require("../../model");
 
 
 // Home page && read the database from the table
 exports.homePage = async (req, res) => {
-  const data = await blog.findAll();
+  const data = await blog.findAll({
+    include: {
+      model: user
+    }
+  });      // join the table to show the data of the other table
+
+
   res.render('Blog', {
     data,
   });
@@ -22,6 +28,9 @@ exports.singleBlog = async (req, res) => { // :id denote the dynamic data
   const [data] = await blog.findAll({
     where: {
       id: id
+    },
+    include: {
+      model: user
     }
   })
   res.render('SingleBlog', {
@@ -96,3 +105,23 @@ exports.updatePost = async (req, res) => {
 
 }
 
+
+exports.showMyBlog = async (req, res) => {
+  const userId = req.users;
+  // console.log(id);
+
+  const data = await blog.findAll({
+    where: {
+      userId
+    },
+    include: {
+      model: user
+    }
+  })
+  console.log(data);
+
+  res.render("myBlog", {
+    data
+  })
+
+}

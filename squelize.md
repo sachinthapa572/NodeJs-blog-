@@ -4,8 +4,14 @@
 
 
 
-- .create()  insert data into the database
+- .create({})  insert data into the database
 - .findAll()  select data from the database
+- .findAll({where: {}})  select data from the database with a condition
+- .findAll({include: {
+        model: ModelName,
+        where: {condition}
+    }})  select data from the database with a join
+
 - .update()  update data in the database
 - .destroy()  delete data from the database
 - .sync()  synchronize the model with the database
