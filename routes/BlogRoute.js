@@ -1,14 +1,15 @@
 const router = require('express').Router();
 
-const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost, signupUser, loginPage, loginUser, signupPage } = require('../controller/blog/blogController');
+const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost } = require('../controller/blog/blogController');
+const { signupPage, signupUser, loginPage, loginUser } = require('../controller/auth/authController');
 
-router.route('/').get(homePage);
-router.route('/createblog').get(createPost);
-router.route('/addpost').post(addPost);
-router.route('/blog/:id').get(singleBlog);
-router.route('/deletepost/:id').get(deletePost);
-router.route('/editpost/:id').get(editPost);
-router.route('/updatepost/:id').post(updatePost);
+router.route('/').get(homePage);                        // home page
+router.route('/createblog').get(createPost);            // create blog page
+router.route('/addpost').post(addPost);                 // add the post in the database
+router.route('/blog/:id').get(singleBlog);              // single blog page
+router.route('/deletepost/:id').get(deletePost);   // delete the post
+router.route('/editpost/:id').get(editPost);        // edit post
+router.route('/updatepost/:id').post(updatePost);  // update the post
 
 //! user routes
 

@@ -23,10 +23,25 @@ db.sequelize = sequelize;
 db.blog = require('./Blogmodel.js')(sequelize, DataTypes);
 db.user = require('./UserModel.js')(sequelize, DataTypes);
 
+// Database Relation
+
+db.blog.belongsTo(db.user, {
+  foreignKey: 'userId',
+  onDelete: 'CASCADE',
+});
+
+db.user.hasMany(db.blog, {
+  foreignKey: 'userId',
+  onDelete: 'CASCADE',
+});
+
 
 // to make any change to the db schema make it true and default let it be false
 db.sequelize.sync({ force: false }).then(() => {
   console.log('re-sync done');
 });
+
+
+
 
 module.exports = db;

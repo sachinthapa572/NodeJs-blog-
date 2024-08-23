@@ -1,30 +1,39 @@
 const express = require('express');
-const { blog, user } = require('./model/index');
-const { where } = require('sequelize');
-const bcrypt = require('bcrypt')
-
-const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost, signupUser, loginPage, loginUser, signupPage } = require('./controller/blog/blogController');
+const cookieParser = require('cookie-parser');
 const blogRoute = require('./routes/BlogRoute');
+require('dotenv').config();
+
+//! app creating 
 const app = express();
-// handel the form data or handel the incomming json payload (bodyparser ko alternative)
+
+//! database connection
+require('./model/index');
+
+
+//! handel the form data or handel the incomming json payload (bodyparser ko alternative)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// ejs lai setup
+
+//! Use the cookie-parser middleware
+app.use(cookieParser());
+
+//! ejs lai setup
 app.set('view engine', 'ejs');
 
+//! setting of the routes
+app.use('', blogRoute);  // localhost:3000/ + blogRoute
+// app.use('/test', blogRoute);  // localhost:3000/test + blogRoute
 
-// setting of the routes
-app.use('/', blogRoute);
 
-//  static file ko lagi
+//!  static file ko lagi
 app.use(express.static('public/css'));
 app.use(express.static('public/images'));
 
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-// database connection
-require('./model/index');
+
+
