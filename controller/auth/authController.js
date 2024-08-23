@@ -58,7 +58,7 @@ exports.loginUser = async (req, res) => {
         const userExist = await user.findOne({
             where: { email }
         });
-        console.log(userExist.id);
+        // console.log(userExist.id);
 
         if (!userExist) {
             return res.render('login', {
@@ -99,4 +99,9 @@ exports.loginUser = async (req, res) => {
             error: "An unexpected error occurred. Please try again."
         });
     }
+}
+
+exports.logoutUser = (req, res) => {
+    res.clearCookie('token')
+    res.redirect('/loginpage')
 }

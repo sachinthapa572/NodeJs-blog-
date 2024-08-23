@@ -1,12 +1,21 @@
 <nav>
     <ul>
         <li><a href="/">Home</a></li>
-        <li><a href="/createblog">ADD BLOG</a></li>
+        <% if (islogined) { %>
+            <li><a href="/createblog">Create Blog</a></li>
+            <li><a href="/myBlog">My Blogs</a></li>
+            <li><a href="/logout">Logout</a></li>
+
+            <% } else { %>
+                <li><a href="/loginpage">Login</a></li>
+                <li><a href="/signuppage">Register</a></li>
+                <% } %>
 
 
-        <li><a href="/loginpage">Login In</a></li>
-        <li><a href="/signuppage">Sign Up</a></li>
-        <li><a href="/myBlog">My Blogs</a></li>
+
+
+
+
 
     </ul>
 </nav>

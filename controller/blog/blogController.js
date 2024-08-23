@@ -99,11 +99,20 @@ exports.editPost = async (req, res) => {
 exports.updatePost = async (req, res) => {
   const id = req.params.id
   const { title, subtitle, description } = req.body;
+  console.log(req.file);
+  const image = `http://localhost:3000/${req.file.filename}`
+
+  //* flash use hanerw milauna parcha 
+  if (!(title || subtitle || description || image)) {
+    return res.send("Enter the all fied 💕")
+  }
+
 
   await blog.update({
     title,
     subtitle,
-    description
+    description,
+    image
   }, {
     where: {
       id: id
