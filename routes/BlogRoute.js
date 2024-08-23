@@ -2,14 +2,15 @@ const router = require('express').Router();
 
 const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost } = require('../controller/blog/blogController');
 const { signupPage, signupUser, loginPage, loginUser } = require('../controller/auth/authController');
+const { isAuth } = require('../middelware/isAuth');
 
-router.route('/').get(homePage);                        // home page
-router.route('/createblog').get(createPost);            // create blog page
-router.route('/addpost').post(addPost);                 // add the post in the database
-router.route('/blog/:id').get(singleBlog);              // single blog page
-router.route('/deletepost/:id').get(deletePost);   // delete the post
-router.route('/editpost/:id').get(editPost);        // edit post
-router.route('/updatepost/:id').post(updatePost);  // update the post
+router.route('/').get(homePage);
+router.route('/createblog').get(createPost);            // isAuth is the middelware
+router.route('/addpost').post(isAuth, addPost);
+router.route('/blog/:id').get(singleBlog);
+router.route('/deletepost/:id').get(deletePost);
+router.route('/editpost/:id').get(editPost);
+router.route('/updatepost/:id').post(updatePost);
 
 //! user routes
 
