@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 //! Use the cookie-parser middleware
 app.use(cookieParser());
 
+// setting the global variable
 app.use((req, res, next) => {
   res.locals.islogined = req.cookies.token || null
   next()
@@ -36,6 +37,8 @@ app.use('', authRoute)
 //!  static file ko lagi
 app.use(express.static('public/css'));
 app.use(express.static('uploads/'));
+app.use(express.static('node_modules/tinymce/'));
+
 
 
 const PORT = process.env.PORT || 3001;

@@ -4,13 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Page with Navbar and Footer</title>
+    <title>Add post </title>
     <link rel="stylesheet" href="CreateBlog.css">
 </head>
 
 <body>
     <%- include('./components/navbar') %>
-
 
         <div class="container">
             <h1>Enter the Blog details</h1>
@@ -27,8 +26,9 @@
 
                 <div class="form-group">
                     <label for="description">Description:</label>
-                    <textarea id="description" name="description" rows="5" required></textarea>
+                    <textarea id="my-expressjs-tinymce-app" name="description" required></textarea>
                 </div>
+
                 <div class="form-group">
                     <label for="image">Image:</label>
                     <input type="file" id="image" name="image" required>
@@ -41,5 +41,32 @@
             <p>&copy; 2024 Your Website. All Rights Reserved.</p>
         </footer>
 </body>
+
+<!-- Load TinyMCE from the static files you served -->
+<script src="/tinymce.min.js"></script>
+
+<!-- Include your TinyMCE initialization -->
+<script>
+    tinymce.init({
+        selector: 'textarea#my-expressjs-tinymce-app',
+        height: 500,
+        menubar: true,
+        plugins: [
+            'a11ychecker', 'advlist', 'advcode', 'advtable', 'autolink', 'checklist', 'markdown',
+            'lists', 'link', 'image', 'charmap', 'preview', 'anchor', 'searchreplace', 'visualblocks',
+            'powerpaste', 'fullscreen', 'formatpainter', 'insertdatetime', 'media', 'table', 'help', 'wordcount'
+        ],
+        toolbar: 'undo redo | casechange blocks | bold italic backcolor | ' +
+            'alignleft aligncenter alignright alignjustify | ' +
+            'bullist numlist checklist outdent indent | removeformat | a11ycheck code table help',
+
+        // This will ensure the content is saved to the textarea on form submit
+        setup: function (editor) {
+            editor.on('change', function () {
+                editor.save();
+            });
+        }
+    });
+</script>
 
 </html>

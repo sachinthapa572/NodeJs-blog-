@@ -105,3 +105,14 @@ footer {
     padding: 10px 0;
     margin-top: 40px;
 }
+
+
+.password-group {
+    display: flex;
+    justify-content: space-between;
+}
+
+.password-group a {
+    text-decoration: none;
+    cursor: pointer;
+}

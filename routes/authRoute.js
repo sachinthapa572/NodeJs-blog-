@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { signupPage, signupUser, loginPage, loginUser, logoutUser } = require('../controller/auth/authController');
+const { signupPage, signupUser, loginPage, loginUser, logoutUser, recoverPasswordPage } = require('../controller/auth/authController');
 
 
 router.route('/signuppage').get(signupPage);

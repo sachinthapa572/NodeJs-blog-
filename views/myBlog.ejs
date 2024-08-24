@@ -10,23 +10,24 @@
 
 <body>
     <%- include('./components/navbar') %>
+
+        <h1 style="text-align: center;">Your Blogs</h1>
         <main>
             <div class="container">
                 <% if (data && data.length> 0) { %>
                     <% data.forEach(blog=> { %>
                         <div class="card">
                             <h2>
-                                <%= blog.title %>
+                                <%- blog.title %>
                             </h2>
                             <h3>
-                                <%= blog.subtitle %>
+                                <%- blog.subtitle %>
                             </h3>
-                            <p class="truncate">
-                                <%= blog.description %>
-                            </p>
                             <p>Owner: <%- blog.user.username %>
                             </p>
                             <a href="/blog/<%= blog.id %>"><button>Read More</button></a>
+                            <a href="/editpost/<%= blog.id %>"><button>Update</button></a>
+                            <a href="/deletepost/<%= blog.id %>"><button>Delete</button></a>
                         </div>
                         <% }) %>
             </div>

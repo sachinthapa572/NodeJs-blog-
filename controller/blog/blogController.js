@@ -9,8 +9,6 @@ exports.homePage = async (req, res) => {
       model: user
     }
   });      // join the table to show the data of the other table
-
-
   res.render('Blog', {
     data,
   });
@@ -176,3 +174,23 @@ exports.showMyBlog = async (req, res) => {
   })
 
 }
+
+
+exports.testshow = (req, res) => {
+  res.render('test')
+}
+
+exports.uploads = (req, res) => {
+  // Log the submitted form data
+  console.log(req.body);
+
+  // Access the TinyMCE content (from the textarea)
+  const description = req.body.description;
+  console.log('TinyMCE Content:', description);
+  return
+
+  // Return a response or redirect as needed
+  // res.send('Form data received');
+};
+
+

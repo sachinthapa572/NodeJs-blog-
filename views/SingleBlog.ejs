@@ -15,27 +15,24 @@
         <main>
             <div class="blog-container">
                 <h1>
-                    <%= data.title %>
+                    <%- data.title %>
                 </h1>
                 <p>Author: <%- data.user.username %></p>
                 <p class="blog-meta">
-                    <%= data.createdAt %>
+                    <%= data.createdAt %>S
                 </p>
 
                 <div class="blog-image">
                     <img src="<%- data.image %>" alt="<%- data.title %>">
                 </div>
                 <p>
-                    <%= data.subtitle %>
+                    <%- data.subtitle %>
                 </p>
                 <div class="blog-content">
                     <p>
-                        <%= data.description %>
+                        <%- data.description %>
                     </p>
                 </div>
-                <a href="/deletepost/<%= data.id %>"><button>Delete</button></a>
-                <a href="/editpost/<%= data.id %>"><button>Update</button></a>
-
             </div>
         </main>
 

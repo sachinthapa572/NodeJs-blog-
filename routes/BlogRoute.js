@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost, showMyBlog } = require('../controller/blog/blogController');
+const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost, showMyBlog, testshow, uploads } = require('../controller/blog/blogController');
 const { isAuth } = require('../middleware/isAuth.middleware');
 // multer  config 
 const { multer, storage } = require('../middleware/multer.middleware')
@@ -14,5 +14,6 @@ router.route('/deletepost/:id').get(isAuth, deletePost);
 router.route('/editpost/:id').get(isAuth, editPost);
 router.route('/updatepost/:id').post(isAuth, upload.single('image'), updatePost);
 router.route('/myBlog').get(isAuth, showMyBlog);
+router.route('/test').get(testshow).post(upload.none(), uploads);
 
 module.exports = router;
