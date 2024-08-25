@@ -43,7 +43,8 @@ main {
     margin: 20px auto;
     background-color: white;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px; /* Rounded corners for the main section */
+    border-radius: 8px;
+    /* Rounded corners for the main section */
 }
 
 .blog-container {
@@ -75,11 +76,12 @@ main {
 }
 
 .blog-image img {
-    width: 200px; /* Fixed width */
-    height: 200px; /* Fixed height */
-    border-radius: 50%; /* Circular image */
-    object-fit: cover; /* Ensures the image covers the area without distortion */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds shadow for depth */
+
+    /* aspect-ratio: 16/9; */
+    width: 100%;
+    height: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    
 }
 
 .blog-content p {

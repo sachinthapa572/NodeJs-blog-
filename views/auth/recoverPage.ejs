@@ -30,8 +30,7 @@
                     <div class="recovery-container">
                         <h2>Password Recovery</h2>
                         <p>Enter the OTP sent to your email address below to reset your password.</p>
-                        <form action="/recover-password" method="post">
-                            <input type="hidden" name="email" value="<%- email %>">
+                        <form action="/handel-otp/<%- email %>" method="post">
                             <input type="text" name="otp" placeholder="OTP" required>
                             <button type="submit">Verify OTP</button>
                         </form>

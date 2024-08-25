@@ -116,6 +116,7 @@ exports.recoverPasswordPage = (req, res) => {
         error: null,
         isotp: false,
         email: null
+        // email: "thapasachin572@gmail.com"
     })
 }
 
@@ -147,25 +148,71 @@ exports.checkuser = async (req, res) => {
     }
 
 
-    const otp = otpGenerator.generate(OTPlength, // package bata generate gare ko 
+    const generatedOTP = otpGenerator.generate(OTPlength, // package bata generate gare ko 
         {
             lowerCaseAlphabets: false,
             upperCaseAlphabets: false,
             specialChars: false
         });
 
-    console.log(otp);
+    console.log(generatedOTP);
     // return
 
     await sendEmail({
         email: email,
         subject: "NodeBlog : Reset the Password ",
-        otp
+        otp: generatedOTP
     })
 
-    return res.render('auth/recoverPage', {
+    // update the otp and the otpGeneratedTime in the database
+    // TODO: hashed the otp before saving it to the database
+    userExist.otp = await bcrypt.hash(generatedOTP, 10);
+    userExist.otpGeneratedTime = Date.now()
+    await userExist.save();         // save the update to the database 
+    return res.render(`auth/recoverPage`, {
         error: null,
         isotp: true,
         email: email
     })
+}
+
+exports.handelOTP = async (req, res) => {
+    const generatedOTP = req.body.otp
+    const email = String(req.params.id)
+    if (!(generatedOTP || email))
+        return res.send("Enter the email or the Otp")
+    const [data] = await user.findAll({
+        where: {
+            email: email,
+        }
+    })
+
+    const userExist = await bcrypt.compare(generatedOTP, data.otp)
+
+    console.log(userExist);
+    if (!userExist) {
+        console.log("doest match the code");
+        res.send("The OTP does not match")
+    } else {
+        const currentTime = Date.now();
+        const otpGeneratedTime = userExist.otpGeneratedTime
+
+        // check if the otp has been expired or not
+        if (currentTime - otpGeneratedTime > 2 * 60 * 1000) {
+            console.log("OTP has been expired")
+            return res.send("OTP has been expired")
+        } else {
+            console.log("OTP has been verified");
+            // return res.render('auth/resetPassword', {
+            //     email: email
+            // })
+            data.otp = null;
+            data.otpGeneratedTime = null;
+            await data.save();
+            return res.send("OTP has been verified")
+        }
+
+
+    }
+    return
 }
