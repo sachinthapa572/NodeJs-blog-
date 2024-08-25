@@ -36,6 +36,7 @@ app.use('', authRoute)
 
 //!  static file ko lagi
 app.use(express.static('public/css'));
+app.use(express.static('public/images'));
 app.use(express.static('uploads/'));
 app.use(express.static('node_modules/tinymce/'));
 
