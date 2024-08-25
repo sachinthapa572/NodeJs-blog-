@@ -163,5 +163,9 @@ exports.checkuser = async (req, res) => {
         otp
     })
 
-    return res.send("Email send sucessfully ")
+    return res.render('auth/recoverPage', {
+        error: null,
+        isotp: true,
+        email: email
+    })
 }
