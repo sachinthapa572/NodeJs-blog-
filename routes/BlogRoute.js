@@ -14,6 +14,6 @@ router.route('/deletepost/:id').get(isAuth, deletePost);
 router.route('/editpost/:id').get(isAuth, editPost);
 router.route('/updatepost/:id').post(isAuth, upload.single('image'), updatePost);
 router.route('/myBlog').get(isAuth, showMyBlog);
-router.route('/test').get(testshow).post(upload.none(), uploads);
+// router.route('/test').get(testshow).post(upload.none(), uploads);
 
 module.exports = router;

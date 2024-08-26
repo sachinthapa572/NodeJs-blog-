@@ -111,12 +111,13 @@ exports.logoutUser = (req, res) => {
 }
 
 
+//! password section
+
 exports.recoverPasswordPage = (req, res) => {
     return res.render('auth/recoverPage', {
         error: null,
         isotp: false,
         email: null
-        // email: "thapasachin572@gmail.com"
     })
 }
 
@@ -169,10 +170,17 @@ exports.checkuser = async (req, res) => {
     userExist.otp = await bcrypt.hash(generatedOTP, 10);
     userExist.otpGeneratedTime = Date.now()
     await userExist.save();         // save the update to the database 
+
     return res.render(`auth/recoverPage`, {
         error: null,
         isotp: true,
         email: email
+    })
+}
+exports.changePasswordPage = (req, res) => {
+    const email = req.params.id
+    return res.render('auth/changePassword', {
+        email
     })
 }
 
@@ -186,8 +194,9 @@ exports.handelOTP = async (req, res) => {
             email: email,
         }
     })
+    console.log(generatedOTP, data);
 
-    const userExist = await bcrypt.compare(generatedOTP, data.otp)
+    const userExist = await bcrypt.compare(generatedOTP, data?.otp)
 
     console.log(userExist);
     if (!userExist) {
@@ -203,16 +212,35 @@ exports.handelOTP = async (req, res) => {
             return res.send("OTP has been expired")
         } else {
             console.log("OTP has been verified");
-            // return res.render('auth/resetPassword', {
-            //     email: email
-            // })
             data.otp = null;
             data.otpGeneratedTime = null;
             await data.save();
-            return res.send("OTP has been verified")
+            return res.redirect('/changePassword/' + email)
         }
-
-
     }
-    return
+
 }
+
+
+
+exports.changePassword = async (req, res) => {
+    const email = req.params.id
+    const { password, confirmPassword } = req.body
+    console.log(email, password, confirmPassword);
+    if (!(password || confirmPassword))
+        return res.send("Enter the password or the confirmPassword")
+    if (password !== confirmPassword)
+        return res.send("Password does not match")
+
+    const [data] = await user.findAll({
+        where: {
+            email: email
+        }
+    })
+    const newpassword = await bcrypt.hash(password, 10)
+    data.password = newpassword
+    await data.save()
+    return res.redirect('/loginpage')
+
+}
+

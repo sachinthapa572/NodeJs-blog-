@@ -115,4 +115,10 @@ footer {
 .password-group a {
     text-decoration: none;
     cursor: pointer;
+
+}
+
+.password-group a:hover {
+    text-decoration: underline;
+    color: #721c24;
 }

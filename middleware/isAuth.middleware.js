@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const { promisify } = require('util');
 const { user } = require('../model');
 const { where } = require('sequelize');
+const { jwtDecode } = require('../utils/decodeJwtToken');
 
 exports.isAuth = async (req, res, next) => {
 
@@ -25,7 +26,9 @@ exports.isAuth = async (req, res, next) => {
 
 
     // easier step use the promisify le aafai handel garcha tyo pacahdi ko kura le 
-    const decodedResult = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
+    // const decodedResult = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
+    const decodedResult = await jwtDecode(token)
+
 
     // check the user is present or not 
     const userExist = await user.findAll({

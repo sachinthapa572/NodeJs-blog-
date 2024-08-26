@@ -34,10 +34,23 @@
                     </p>
                 </div>
             </div>
+            <div>
+                <% if(currentUserId) { %>
+                    <% if (currentUserId===data.id) { %>
+                        <a href="/editpost/<%= data.id %>"><button>Update</button></a>
+                        <a href="/deletepost/<%= data.id %>"><button>Delete</button></a>
+
+                        <% } %>
+
+                            <% } %>
+            </div>
+
         </main>
 
         <footer>
-            <p>&copy; 2024 Your Website. All Rights Reserved.</p>
+
+            <% console.log("this is value" , currentUserId); %>
+                <p>&copy; 2024 Your Website. All Rights Reserved.</p>
         </footer>
 </body>
 

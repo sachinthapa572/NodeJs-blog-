@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const blogRoute = require('./routes/BlogRoute');
 const authRoute = require('./routes/authRoute');
+const { jwtDecode } = require('./utils/decodeJwtToken');
 require('dotenv').config();
 
 //! app creating 
@@ -22,7 +23,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // setting the global variable
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
+  const token = req.cookies.token || null
+
+  if (token) {
+    let decodedToken = await jwtDecode(token)
+    console.log(decodedToken.id);
+    if (decodedToken && decodedToken.id) {
+      console.log('hello');
+      res.locals.currentUserId = decodedToken.id || null
+
+    }
+  }
   res.locals.islogined = req.cookies.token || null
   next()
 
