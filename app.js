@@ -1,7 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const blogRoute = require('./routes/BlogRoute');
-const authRoute = require('./routes/authRoute');
+const blogRoute = require('./routes/blog.routes');
+const authRoute = require('./routes/auth.routes');
 const { jwtDecode } = require('./utils/decodeJwtToken');
 require('dotenv').config();
 
@@ -30,14 +30,11 @@ app.use(async (req, res, next) => {
     let decodedToken = await jwtDecode(token)
     console.log(decodedToken.id);
     if (decodedToken && decodedToken.id) {
-      console.log('hello');
       res.locals.currentUserId = decodedToken.id || null
-
     }
   }
   res.locals.islogined = req.cookies.token || null
   next()
-
 })
 
 //! setting of the routes

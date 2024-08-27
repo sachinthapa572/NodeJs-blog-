@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost, showMyBlog, testshow, uploads } = require('../controller/blog/blogController');
+const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost, showMyBlog, testshow, uploads } = require('../controller/blog/blog.controller');
 const { isAuth } = require('../middleware/isAuth.middleware');
 // multer  config 
 const { multer, storage } = require('../middleware/multer.middleware')

@@ -1,4 +1,4 @@
-const { DB, HOST, PASSWORD, USER, dialect, pool } = require('../config/dbconfig');
+const { DB, HOST, PASSWORD, USER, dialect, pool } = require('../config/db.config.js');
 const { Sequelize, DataTypes } = require('sequelize');
 
 const sequelize = new Sequelize(DB, USER, PASSWORD, {
@@ -20,11 +20,10 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 // importing the SchemaModel of the tabel
-db.blog = require('./Blogmodel.js')(sequelize, DataTypes);
-db.user = require('./UserModel.js')(sequelize, DataTypes);
+db.blog = require('./blog.model.js')(sequelize, DataTypes);
+db.user = require('./user.model.js')(sequelize, DataTypes);
 
 // Database Relation
-
 db.blog.belongsTo(db.user, {
   foreignKey: 'userId',
   onDelete: 'CASCADE',

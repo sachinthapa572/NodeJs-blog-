@@ -215,31 +215,50 @@ exports.handelOTP = async (req, res) => {
             data.otp = null;
             data.otpGeneratedTime = null;
             await data.save();
-            return res.redirect('/changePassword/' + email)
+            return res.redirect(`/changePassword/${email}?otp=${generatedOTP}`)
         }
     }
-
 }
 
 
 
 exports.changePassword = async (req, res) => {
     const email = req.params.id
+    const otp = req.query.otp || null
     const { password, confirmPassword } = req.body
-    console.log(email, password, confirmPassword);
+    // console.log(email, password, confirmPassword);
+
+    // if ((!email || !otp))
+    //     return res.send("Enter the email or the otp")
+
+
+    const [data] = await user.findAll({
+        where: {
+            email: email,
+        }
+    })
+
+    // check if the otp is of the user or not (page has been accessed directly or not)
+    if (!bcrypt.compare(otp, data?.otp))
+        return res.send("Dont try this .. ")
+
     if (!(password || confirmPassword))
         return res.send("Enter the password or the confirmPassword")
     if (password !== confirmPassword)
         return res.send("Password does not match")
 
-    const [data] = await user.findAll({
+    const newpassword = await bcrypt.hash(password, 10)
+
+    // data.password = newpassword
+    // await data.save()
+
+    await user.update({
+        password: newpassword
+    }, {
         where: {
             email: email
         }
     })
-    const newpassword = await bcrypt.hash(password, 10)
-    data.password = newpassword
-    await data.save()
     return res.redirect('/loginpage')
 
 }
