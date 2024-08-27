@@ -20,33 +20,25 @@ exports.signupUser = async (req, res) => {
     if (!username || !email || !password || username.length < 2) {
         return res
             .status(404)
-            .render('signup', {
-                error: "Please fill in all fields."
-            });
+            .send("Please provide both username and password.");
     }
-    try {
-        // check if the email already exists or not 
-        const [userExist] = await user.findAll({
-            where: { email }
-        });
-        if (userExist) {
-            req.flash('error', 'Email already exists.')
-            return res.redirect('/signuppage')
-        }
-        let newpassword = await bcrypt.hash(password, 10);
-        // Create new user
-        await user.create({
-            username,
-            email,
-            password: newpassword
-        });
-        // return res.render('login');
-        req.flash('message', 'Registration successful. Please login.')
-        res.redirect('/loginpage');
-    } catch (error) {
-        req.flash('error', 'An error occurred during registration. Please try again.')
-        res.redirect('/signuppage');
+    // check if the email already exists or not 
+    const [userExist] = await user.findAll({
+        where: { email }
+    });
+    if (userExist) {
+        req.flash('error', 'Email already exists.')
+        return res.redirect('/signuppage')
     }
+    let newpassword = await bcrypt.hash(password, 10);
+    // Create new user
+    await user.create({
+        username,
+        email,
+        password: newpassword
+    });
+    req.flash('message', 'Registration successful. Please login.')
+    res.redirect('/loginpage');
 }
 
 // login page 
@@ -70,55 +62,45 @@ exports.loginUser = async (req, res) => {
             .status(404)
             .send("Please provide both email and password.");
     }
-    try {
-        // Find the user by email
-        const [userExist] = await user.findAll({
-            where: { email }
-        });
-        if (!userExist) {
-            req.flash('error', 'User does not exist.')
-            return res.redirect('/loginpage')
-        }
 
-        // Validate password
-        const validPassword = await bcrypt.compare(password, userExist.password);
-        if (!validPassword) {
-            req.flash('error', 'Invalid password. Please try again.')
-            return res.redirect('/loginpage')
-        } else {
-
-            //! setting of the  jWT token
-            const token = jwt.sign({ id: userExist.id }, String(process.env.JWT_SECRET), {
-                expiresIn: '15d'
-            })
-            //! this will set the cookie in the browser
-            res.cookie('token', token, {
-                // expires: new Date(Date.now() + 1 * 60 * 1000),
-                expires: new Date(Date.now() + 3600000), // cookie will be removed after 1 hour
-                httpOnly: true,
-                secure: true
-            });
-        }
-
-        // If login is successful, redirect to the homepage
-        req.flash('message', 'Login successful.')
-        res.redirect('/');
-    } catch (error) {
-        req.flash('error', 'An unexpected error occurred. Please try again.')
-        res.redirect('/loginpage')
+    // Find the user by email
+    const [userExist] = await user.findAll({
+        where: { email }
+    });
+    if (!userExist) {
+        req.flash('error', 'User does not exist.')
+        return res.redirect('/loginpage')
     }
+
+    // Validate password
+    const validPassword = await bcrypt.compare(password, userExist.password);
+    if (!validPassword) {
+        req.flash('error', 'Invalid password. Please try again.')
+        return res.redirect('/loginpage')
+    } else {
+
+        //! setting of the  jWT token
+        const token = jwt.sign({ id: userExist.id }, String(process.env.JWT_SECRET), {
+            expiresIn: '15d'
+        })
+        //! this will set the cookie in the browser
+        res.cookie('token', token, {
+            // expires: new Date(Date.now() + 1 * 60 * 1000),
+            expires: new Date(Date.now() + 3600000), // cookie will be removed after 1 hour
+            httpOnly: true,
+            secure: true
+        });
+    }
+
+    // If login is successful, redirect to the homepage
+    req.flash('message', 'Login successful.')
+    res.redirect('/');
 }
 
 exports.logoutUser = (req, res) => {
-    try {
-        res.clearCookie('token')
-        req.flash('message', 'Logged out successfully.')
-        res.redirect('/')
-    } catch (error) {
-        req.flash('message', 'An error occurred while logging out.')
-        res.redirect('/')
-
-    }
+    res.clearCookie('token')
+    req.flash('message', 'Logged out successfully.')
+    res.redirect('/')
 }
 
 
@@ -126,23 +108,19 @@ exports.logoutUser = (req, res) => {
 
 //!  recover password section 
 exports.recoverPasswordPage = (req, res) => {
+    const message = req.flash('message')
     return res.render('auth/recoverPage', {
         error: null,
         isotp: false,
-        email: null
+        email: null,
+        message: message.length > 0 ? message : null
     })
 }
 
 exports.checkuser = async (req, res) => {
     const email = req.body.email;
-    console.log(email);
     if (!email) {
-        console.log("Enter the mail to proceed ");
-        return res.render('auth/recoverPage', {
-            error: "Enter the email to proceed ",
-            isotp: false,
-            email: null
-        })
+        return res.status(400).send("Please provide an email.");
     }
 
     const [userExist] = await user.findAll({
@@ -168,9 +146,6 @@ exports.checkuser = async (req, res) => {
             specialChars: false
         });
 
-    console.log(generatedOTP);
-    // return
-
     await sendEmail({
         email: email,
         subject: "NodeBlog : Reset the Password ",
@@ -188,12 +163,16 @@ exports.checkuser = async (req, res) => {
         email: email
     })
 }
+
 exports.changePasswordPage = (req, res) => {
     const email = req.params.id
     const otp = req.query.otp
+    if (!email || !otp)
+        return res.status(400).send("Please provide both email and OTP.")
+
     return res.render('auth/changePassword', {
         email,
-        otp
+        otp,
     })
 }
 
@@ -209,33 +188,32 @@ exports.handelOTP = async (req, res) => {
             email: email,
         }
     })
+    if (!data) {
+        console.log("The user does not exist")
+        return res.send("The user does not exist")
+    }
     const userExist = await bcrypt.compare(generatedOTP, data?.otp)
-
-    console.log(userExist);
     if (!userExist) {
-        console.log("doest match the code");
-        res.send("The OTP does not match")
+        req.flash('error', 'The OTP does not match')
+        return res.redirect(`/recover-password`)
+
     } else {
         const currentTime = Date.now();
         const otpGeneratedTime = userExist.otpGeneratedTime
 
         // check if the otp has been expired or not
         if (currentTime - otpGeneratedTime > 2 * 60 * 1000) {
-            console.log("OTP has been expired")
-            return res.send("OTP has been expired")
+            data.otp = null;
+            data.otpGeneratedTime = null;
+            await data.save();
+            req.flash('message', 'OTP has expired. Please try again.');
+            return res.redirect(`/recover-password`);
         } else {
             console.log("OTP has been verified");
-            // data.otp = null;
-            // data.otpGeneratedTime = null;
-            // await data.save();
-
             return res.redirect(`/changePassword/${email}?otp=${generatedOTP}`)
         }
     }
 }
-
-
-
 
 exports.changePassword = async (req, res) => {
     try {
@@ -268,7 +246,11 @@ exports.changePassword = async (req, res) => {
 
         // Check if OTP has expired
         if (currentTime - otpGeneratedTime > 2 * 60 * 1000) { // 2 minutes expiry
-            return res.status(400).send("OTP has expired.");
+            data.otp = null;
+            data.otpGeneratedTime = null;
+            await data.save();
+            req.flash('message', 'OTP has expired. Please try again.');
+            return res.redirect(`/recover-password`);
         }
 
         // Hash the new password and save

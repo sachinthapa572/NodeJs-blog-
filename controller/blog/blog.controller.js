@@ -1,3 +1,4 @@
+const { error } = require("console");
 const { blog, user } = require("../../model");
 const fs = require('fs')
 
@@ -12,7 +13,7 @@ exports.homePage = async (req, res) => {
   });
   res.render('Blog', {
     data,
-    message: message.length > 0 ? message : null
+    message: message.length > 0 ? message : null,
   });
 }
 
@@ -54,21 +55,17 @@ exports.addPost = async (req, res) => {
       .send("Enter the all fied 💕")
   }
 
-  try {
-    blog.create({
-      title,
-      subtitle,
-      description,
-      userId,
-      image
-    });
+  blog.create({
+    title,
+    subtitle,
+    description,
+    userId,
+    image
+  });
 
-    req.flash('message', 'Post added successfully')
-    res.redirect('/'); // redirect to the given page
-  } catch (error) {
-    console.log(error);
-    res.send("Error in the server")
-  }
+  req.flash('message', 'Post added successfully')
+  res.redirect('/'); // redirect to the given page
+
 }
 
 // delete the post

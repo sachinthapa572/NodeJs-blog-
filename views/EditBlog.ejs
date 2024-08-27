@@ -117,6 +117,12 @@
 
 <body>
     <%- include('./components/navbar') %>
+        <% if(error ){ %>
+        <div class="alert alert-success" id="error-msg">
+            <%- error %>
+        </div>
+        <% } %>
+    
         <main>
 
             <div class="container">
@@ -154,6 +160,13 @@
 
         <%- include('./components/Footer') %>
 </body>
+
+<script src="/error-handler.js"></script>
+<script>
+    window.onload = () => {
+        hideErrorMessage('error-msg');
+    };
+</script>
 <!-- Load TinyMCE from the static files you served -->
 <script src="/tinymce.min.js"></script>
 

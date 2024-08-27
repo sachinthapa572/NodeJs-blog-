@@ -11,9 +11,9 @@
 
 <body>
     <%- include('./components/navbar') %>
-        <% if(message){ %>
+        <% if(message || error){ %>
             <div id="error-message">
-                <%= message %>
+                <%= message ||error %>
             </div>
             <% } %>
 

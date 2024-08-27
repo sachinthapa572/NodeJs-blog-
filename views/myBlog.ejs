@@ -11,33 +11,46 @@
 
 <body>
     <%- include('./components/navbar') %>
-
-        <h1 style="text-align: center;">Your Blogs</h1>
-        <main>
-            <div class="container">
-                <% if (data && data.length> 0) { %>
-                    <% data.forEach(blog=> { %>
-                        <div class="card">
-                            <h2>
-                                <%- blog.title %>
-                            </h2>
-                            <h3>
-                                <%- blog.subtitle %>
-                            </h3>
-                            <p>Owner: <%- blog.user.username %>
-                            </p>
-                            <a href="/blog/<%= blog.id %>"><button>Read More</button></a>
-                            <a href="/editpost/<%= blog.id %>"><button>Update</button></a>
-                            <a href="/deletepost/<%= blog.id %>"><button>Delete</button></a>
-                        </div>
-                        <% }) %>
+        <% if(error ){ %>
+            <div class="alert alert-success" id="error-msg">
+                <%- error %>
             </div>
-            <% } else { %>
-                <p>No blogs available.</p>
-                <% } %>
-        </main>
+            <% } %>
 
-        <%- include('./components/Footer') %>
+                <h1 style="text-align: center;">Your Blogs</h1>
+                <main>
+                    <div class="container">
+                        <% if (data && data.length> 0) { %>
+                            <% data.forEach(blog=> { %>
+                                <div class="card">
+                                    <h2>
+                                        <%- blog.title %>
+                                    </h2>
+                                    <h3>
+                                        <%- blog.subtitle %>
+                                    </h3>
+                                    <p>Owner: <%- blog.user.username %>
+                                    </p>
+                                    <a href="/blog/<%= blog.id %>"><button>Read More</button></a>
+                                    <a href="/editpost/<%= blog.id %>"><button>Update</button></a>
+                                    <a href="/deletepost/<%= blog.id %>"><button>Delete</button></a>
+                                </div>
+                                <% }) %>
+                    </div>
+                    <% } else { %>
+                        <p>No blogs available.</p>
+                        <% } %>
+                </main>
+
+                <%- include('./components/Footer') %>
+
 </body>
+
+<script src="/error-handler.js"></script>
+<script>
+    window.onload = () => {
+        hideErrorMessage('error-msg');
+    };
+</script>
 
 </html>

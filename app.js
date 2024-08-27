@@ -42,6 +42,7 @@ app.use(async (req, res, next) => {
     res.locals.currentUserId = null
   }
   res.locals.islogined = req.cookies.token || null
+  res.locals.error = req.flash('error') || null
   next()
 })
 

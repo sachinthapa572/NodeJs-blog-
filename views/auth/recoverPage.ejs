@@ -11,8 +11,8 @@
 <body>
     <div class="container">
         <div class="error-container">
-            <% if (error) { %>
-                <p class="error-message"><%- error %></p>
+            <% if (error||message) { %>
+                <p class="error-message"><%- error||message %></p>
                 <% } %>
         </div>
 
@@ -23,13 +23,14 @@
                     <p>Enter your email address below to reset your password.</p>
                     <form action="/recover-password" method="post">
                         <input type="email" name="email" placeholder="Email Address" required>
-                        <button type="submit">Send Reset Link</button>
+                        <button type="submit">Send OTP</button>
                     </form>
                 </div>
                 <% } else { %>
                     <div class="recovery-container">
                         <h2>Password Recovery</h2>
-                        <p>Enter the OTP sent to your email address below to reset your password.</p>
+                        <p>Enter the OTP sent to your email: <%- email[0] "*" .repeat(Math.min(3, email.indexOf('@') -
+                                1)) + email.slice(email.indexOf('@')) %> below to reset your password.</p>
                         <form action="/handel-otp/<%- email %>" method="post">
                             <input type="text" name="otp" placeholder="OTP" required>
                             <button type="submit">Verify OTP</button>
@@ -39,5 +40,11 @@
         </div>
     </div>
 </body>
+<script src="/error-handler.js"></script>
+<script>
+    window.onload = () => {
+        hideErrorMessage('error-container');
+    };
+</script>
 
 </html>
