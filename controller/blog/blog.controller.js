@@ -4,6 +4,7 @@ const fs = require('fs')
 
 // Home page && read the database from the table
 exports.homePage = async (req, res) => {
+  const message = req.flash('message')
   const data = await blog.findAll({
     include: {
       model: user
@@ -11,6 +12,7 @@ exports.homePage = async (req, res) => {
   });      // join the table to show the data of the other table
   res.render('Blog', {
     data,
+    message: message.length > 0 ? message : null
   });
 }
 

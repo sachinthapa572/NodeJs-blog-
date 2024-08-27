@@ -18,8 +18,8 @@
                 <h2>Sign Up</h2>
 
                 <!-- Display error message if exists -->
-                <% if (typeof error !=='undefined' ) { %>
-                    <div class="error-message">
+                <% if (error) { %>
+                    <div class="error-message" id="error-msg">
                         <%= error %>
                     </div>
                     <% } %>
@@ -45,5 +45,12 @@
 
         <%- include('./components/Footer') %>
 </body>
+<script src="/error-handler.js"></script>
+<script src="/error-handler.js"></script>
+<script>
+    window.onload = () => {
+        hideErrorMessage();
+    };
+</script>
 
 </html>

@@ -8,7 +8,10 @@ const { OTPlength } = require('../../constant');
 
 // signup page 
 exports.signupPage = (req, res) => {
-    return res.render('signup')
+    const error = req.flash('error')
+    return res.render('signup', {
+        error: error.length > 0 ? error : null
+    })
 }
 
 // signup user data 
@@ -18,9 +21,16 @@ exports.signupUser = async (req, res) => {
         return res.render('signup', {
             error: "Please fill in all fields."
         });
-
     }
     try {
+        // check if the email already exists or not 
+        const [userExist] = await user.findAll({
+            where: { email }
+        });
+        if (userExist) {
+            req.flash('error', 'Email already exists.')
+            return res.redirect('/signuppage')
+        }
         let newpassword = await bcrypt.hash(password, 10);
         // Create new user
         await user.create({
@@ -28,13 +38,14 @@ exports.signupUser = async (req, res) => {
             email,
             password: newpassword
         });
-        return res.render('login');
+        // return res.render('login');
+        req.flash('message', 'Registration successful. Please login.')
+        res.redirect('/loginpage');
     } catch (error) {
+        // console.error('Error:', error);
 
-        console.error('Error:', error);
-        return res.render('signup', {
-            error: "An error occurred during registration. Please try again."
-        });
+        req.flash('error', 'An error occurred during registration. Please try again.')
+        res.redirect('/signuppage');
     }
 }
 
@@ -42,10 +53,11 @@ exports.signupUser = async (req, res) => {
 
 exports.loginPage = (req, res) => {
     const error = req.flash('error')
+    const message = req.flash('message')
     return res.render('login',
         {
-            error: error.length > 0 ? error : null
-            // error
+            error: error.length > 0 ? error : null,
+            message: message.length > 0 ? message : null
         }
     )
 }
@@ -62,28 +74,21 @@ exports.loginUser = async (req, res) => {
             where: { email }
         });
         if (!userExist) {
-            // return res.render('login', {
-            //     error: "User does not exist. Please sign up."
-            // });
-            req.flash('error', 'User does not exist. Please sign up.')
+            req.flash('error', 'User does not exist.')
             return res.redirect('/loginpage')
         }
 
         // Validate password
         const validPassword = await bcrypt.compare(password, userExist.password);
         if (!validPassword) {
-            return res.render('login', {
-                error: "Invalid password. Please try again."
-            });
+            req.flash('error', 'Invalid password. Please try again.')
+            return res.redirect('/loginpage')
         } else {
 
             //! setting of the  jWT token
             const token = jwt.sign({ id: userExist.id }, String(process.env.JWT_SECRET), {
                 expiresIn: '15d'
-
             })
-
-
             //! this will set the cookie in the browser
             res.cookie('token', token, {
                 // expires: new Date(Date.now() + 1 * 60 * 1000),
@@ -94,7 +99,7 @@ exports.loginUser = async (req, res) => {
         }
 
         // If login is successful, redirect to the homepage
-
+        req.flash('message', 'Login successful.')
         res.redirect('/');
     } catch (error) {
         console.error('Error:', error);
@@ -105,8 +110,15 @@ exports.loginUser = async (req, res) => {
 }
 
 exports.logoutUser = (req, res) => {
-    res.clearCookie('token')
-    res.redirect('/')
+    try {
+        res.clearCookie('token')
+        req.flash('message', 'Logged out successfully.')
+        res.redirect('/')
+    } catch (error) {
+        req.flash('message', 'An error occurred while logging out.')
+        res.redirect('/')
+
+    }
 }
 
 

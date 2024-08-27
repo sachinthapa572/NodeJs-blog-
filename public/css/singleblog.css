@@ -7,34 +7,34 @@ body {
     background-color: #f4f4f4;
     color: #333;
 }
-
 nav {
     background-color: #333;
-    color: white;
-    padding: 10px 0;
+    padding: 10px 20px;
 }
 
 nav ul {
-    list-style: none;
-    display: flex;
-    justify-content: center;
+    list-style-type: none;
     margin: 0;
     padding: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
 }
 
 nav ul li {
-    margin: 0 20px;
+    margin-right: 20px;
 }
 
 nav ul li a {
     color: white;
     text-decoration: none;
-    font-weight: bold;
-    font-size: 16px;
+    padding: 8px 16px;
+    display: block;
 }
 
 nav ul li a:hover {
-    text-decoration: underline;
+    background-color: #555;
+    border-radius: 4px;
 }
 
 main {

@@ -32,14 +32,14 @@ app.use(flash());
 
 // setting the global variable
 app.use(async (req, res, next) => {
-  const token = req.cookies.token || null
-
+  const token = req.cookies.token
   if (token) {
     let decodedToken = await jwtDecode(token)
-    console.log(decodedToken.id);
-    if (decodedToken && decodedToken.id) {
-      res.locals.currentUserId = decodedToken.id || null
+    if (decodedToken && decodedToken?.id) {
+      res.locals.currentUserId = decodedToken?.id
     }
+  } else {
+    res.locals.currentUserId = null
   }
   res.locals.islogined = req.cookies.token || null
   next()

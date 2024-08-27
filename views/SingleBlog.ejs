@@ -36,15 +36,14 @@
                 </div>
             </div>
             <div>
-                <% if(currentUserId) { %>
-                    <% if (currentUserId===data.id) { %>
+                <% if (currentUserId !== 'undefined') { %>
+                    <% if (currentUserId === data.id) { %>
                         <a href="/editpost/<%= data.id %>"><button>Update</button></a>
                         <a href="/deletepost/<%= data.id %>"><button>Delete</button></a>
-
-                        <% } %>
-
-                            <% } %>
+                    <% } %>
+                <% } %>
             </div>
+            
 
         </main>
         <%- include('./components/Footer') %>

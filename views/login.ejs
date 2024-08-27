@@ -16,9 +16,9 @@
         <main>
             <div class="login-container">
                 <h2>Login</h2>
-                <% if(error){ %>
+                <% if(error||message){ %>
                     <div id="error-message">
-                        <%= error %>
+                        <%= error||message %>
                     </div>
                     <% } %>
 
