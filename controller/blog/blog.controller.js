@@ -6,10 +6,10 @@ const fs = require('fs')
 exports.homePage = async (req, res) => {
   const message = req.flash('message')
   const data = await blog.findAll({
-    include: {
+    include: {          // join the table to show the data of the other table
       model: user
     }
-  });      // join the table to show the data of the other table
+  });
   res.render('Blog', {
     data,
     message: message.length > 0 ? message : null
@@ -22,10 +22,9 @@ exports.createPost = (req, res) => {
 }
 
 // single blog page
-exports.singleBlog = async (req, res) => { // :id denote the dynamic data 
-  console.log(req.params.id);   // to get the :id value 
-  const id = req.params.id
-
+exports.singleBlog = async (req, res) => {            // :id denote the dynamic data  
+  const id = req.params.id          // get the id from the url
+  const message = req.flash('message')
   const [data] = await blog.findAll({
     where: {
       id: id
@@ -35,43 +34,45 @@ exports.singleBlog = async (req, res) => { // :id denote the dynamic data
     }
   })
   res.render('SingleBlog', {
-    data
+    data,
+    message: message.length > 0 ? message : null
   });
 
 }
 
 //! add the post in the database
 exports.addPost = async (req, res) => {
-  // console.log(req.body);
-  // console.log(req.users);
-  console.log(req.file);    // file haru req.body ma aauna so use req.file
-
-
+  // console.log(req.file);    // file haru req.body ma aauna so use req.file
   const { title, subtitle, description } = req.body;
-  const userId = req.users          // isAuthmiddelware le pass gare ko value 
-  const image = `http://localhost:3000/${req.file.filename}`
+  const userId = req?.users          // isAuthmiddelware le pass gare ko value 
+  const image = `http://localhost:3000/${req?.file?.filename}`
 
   //* flash use hanerw milauna parcha 
   if (!(title || subtitle || description || image)) {
-    return res.send("Enter the all fied 💕")
+    return res.
+      status(400)
+      .send("Enter the all fied 💕")
   }
 
+  try {
+    blog.create({
+      title,
+      subtitle,
+      description,
+      userId,
+      image
+    });
 
-  blog.create({
-    title,
-    subtitle,
-    description,
-    userId,
-    image
-  });
-
-  // res.send('sucess');
-  res.redirect('/'); // redirect to the given page
+    req.flash('message', 'Post added successfully')
+    res.redirect('/'); // redirect to the given page
+  } catch (error) {
+    console.log(error);
+    res.send("Error in the server")
+  }
 }
 
 // delete the post
 exports.deletePost = async (req, res) => {
-
   const id = req.params.id;
   // console.log(id);
   const [blogData] = await blog.findAll({
@@ -81,7 +82,7 @@ exports.deletePost = async (req, res) => {
   })
 
   if (blogData) {
-    const imgPath = blogData.image.slice(22)
+    const imgPath = blogData?.image?.slice(22)
     fs.unlink(`uploads/${imgPath}`, (err) => {
       if (err) throw err;
       console.log(`${imgPath} was deleted`);
@@ -94,6 +95,7 @@ exports.deletePost = async (req, res) => {
     }
   })
 
+  req.flash('message', 'Post deleted successfully')
   res.redirect('/')
 }
 
@@ -132,8 +134,7 @@ exports.updatePost = async (req, res) => {
   } else {
     image = blogData.image
   }
-  // console.log(req.file);
-  //* flash use hanerw milauna parcha 
+
   if (!(title || subtitle || description)) {
     return res.send("Enter the all fied 💕")
   }
@@ -149,9 +150,7 @@ exports.updatePost = async (req, res) => {
       id: id
     }
   })
-
-
-
+  req.flash('message', 'Post updated successfully')
   res.redirect('/blog/' + id)
 
 }
@@ -159,8 +158,6 @@ exports.updatePost = async (req, res) => {
 
 exports.showMyBlog = async (req, res) => {
   const userId = req.users;
-  // console.log(id);
-
   const data = await blog.findAll({
     where: {
       userId
@@ -169,8 +166,6 @@ exports.showMyBlog = async (req, res) => {
       model: user
     }
   })
-  console.log(data);
-
   res.render("myBlog", {
     data
   })

@@ -18,9 +18,11 @@ exports.signupPage = (req, res) => {
 exports.signupUser = async (req, res) => {
     const { username, email, password } = req.body;
     if (!username || !email || !password || username.length < 2) {
-        return res.render('signup', {
-            error: "Please fill in all fields."
-        });
+        return res
+            .status(404)
+            .render('signup', {
+                error: "Please fill in all fields."
+            });
     }
     try {
         // check if the email already exists or not 
@@ -42,15 +44,12 @@ exports.signupUser = async (req, res) => {
         req.flash('message', 'Registration successful. Please login.')
         res.redirect('/loginpage');
     } catch (error) {
-        // console.error('Error:', error);
-
         req.flash('error', 'An error occurred during registration. Please try again.')
         res.redirect('/signuppage');
     }
 }
 
 // login page 
-
 exports.loginPage = (req, res) => {
     const error = req.flash('error')
     const message = req.flash('message')
@@ -66,8 +65,11 @@ exports.loginPage = (req, res) => {
 
 exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
-    console.log(email, password);
-
+    if (!email || !password) {
+        return res
+            .status(404)
+            .send("Please provide both email and password.");
+    }
     try {
         // Find the user by email
         const [userExist] = await user.findAll({
@@ -102,10 +104,8 @@ exports.loginUser = async (req, res) => {
         req.flash('message', 'Login successful.')
         res.redirect('/');
     } catch (error) {
-        console.error('Error:', error);
-        res.render('login', {
-            error: "An unexpected error occurred. Please try again."
-        });
+        req.flash('error', 'An unexpected error occurred. Please try again.')
+        res.redirect('/loginpage')
     }
 }
 
@@ -122,8 +122,9 @@ exports.logoutUser = (req, res) => {
 }
 
 
-//! password section
 
+
+//!  recover password section 
 exports.recoverPasswordPage = (req, res) => {
     return res.render('auth/recoverPage', {
         error: null,
@@ -200,14 +201,14 @@ exports.handelOTP = async (req, res) => {
     const generatedOTP = req.body.otp
     const email = String(req.params.id)
     if (!(generatedOTP || email))
-        return res.send("Enter the email or the Otp")
+        return res.
+            status(400).
+            send("Enter the email or the Otp")
     const [data] = await user.findAll({
         where: {
             email: email,
         }
     })
-    console.log(generatedOTP, data);
-
     const userExist = await bcrypt.compare(generatedOTP, data?.otp)
 
     console.log(userExist);
