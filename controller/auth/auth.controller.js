@@ -1,12 +1,10 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const otpGenerator = require('otp-generator')
-
-//! User Authentication
-
 const { user } = require("../../model");
 const sendEmail = require('../../utils/nodeMailer');
 const { OTPlength } = require('../../constant');
+
 
 // signup page 
 exports.signupPage = (req, res) => {
@@ -16,19 +14,14 @@ exports.signupPage = (req, res) => {
 // signup user data 
 exports.signupUser = async (req, res) => {
     const { username, email, password } = req.body;
-
-
     if (!username || !email || !password || username.length < 2) {
         return res.render('signup', {
             error: "Please fill in all fields."
         });
 
     }
-
     try {
-        // Hash the password
         let newpassword = await bcrypt.hash(password, 10);
-
         // Create new user
         await user.create({
             username,
@@ -48,7 +41,13 @@ exports.signupUser = async (req, res) => {
 // login page 
 
 exports.loginPage = (req, res) => {
-    return res.render('login')
+    const error = req.flash('error')
+    return res.render('login',
+        {
+            error: error.length > 0 ? error : null
+            // error
+        }
+    )
 }
 
 // login user
@@ -62,12 +61,12 @@ exports.loginUser = async (req, res) => {
         const [userExist] = await user.findAll({
             where: { email }
         });
-        // console.log(userExist.id);
-
         if (!userExist) {
-            return res.render('login', {
-                error: "User does not exist. Please sign up."
-            });
+            // return res.render('login', {
+            //     error: "User does not exist. Please sign up."
+            // });
+            req.flash('error', 'User does not exist. Please sign up.')
+            return res.redirect('/loginpage')
         }
 
         // Validate password
@@ -166,7 +165,6 @@ exports.checkuser = async (req, res) => {
     })
 
     // update the otp and the otpGeneratedTime in the database
-    // TODO: hashed the otp before saving it to the database
     userExist.otp = await bcrypt.hash(generatedOTP, 10);
     userExist.otpGeneratedTime = Date.now()
     await userExist.save();         // save the update to the database 
@@ -179,8 +177,10 @@ exports.checkuser = async (req, res) => {
 }
 exports.changePasswordPage = (req, res) => {
     const email = req.params.id
+    const otp = req.query.otp
     return res.render('auth/changePassword', {
-        email
+        email,
+        otp
     })
 }
 
@@ -212,9 +212,10 @@ exports.handelOTP = async (req, res) => {
             return res.send("OTP has been expired")
         } else {
             console.log("OTP has been verified");
-            data.otp = null;
-            data.otpGeneratedTime = null;
-            await data.save();
+            // data.otp = null;
+            // data.otpGeneratedTime = null;
+            // await data.save();
+
             return res.redirect(`/changePassword/${email}?otp=${generatedOTP}`)
         }
     }
@@ -222,44 +223,51 @@ exports.handelOTP = async (req, res) => {
 
 
 
+
 exports.changePassword = async (req, res) => {
-    const email = req.params.id
-    const otp = req.query.otp || null
-    const { password, confirmPassword } = req.body
-    // console.log(email, password, confirmPassword);
-
-    // if ((!email || !otp))
-    //     return res.send("Enter the email or the otp")
-
-
-    const [data] = await user.findAll({
-        where: {
-            email: email,
+    try {
+        const email = req.params.id;
+        const otp = req.query.otp;
+        const { password, confirmPassword } = req.body;
+        // Validate passwords
+        if (!password || !confirmPassword) {
+            return res.status(400).send("Please provide both password and confirmPassword.");
         }
-    })
-
-    // check if the otp is of the user or not (page has been accessed directly or not)
-    if (!bcrypt.compare(otp, data?.otp))
-        return res.send("Dont try this .. ")
-
-    if (!(password || confirmPassword))
-        return res.send("Enter the password or the confirmPassword")
-    if (password !== confirmPassword)
-        return res.send("Password does not match")
-
-    const newpassword = await bcrypt.hash(password, 10)
-
-    // data.password = newpassword
-    // await data.save()
-
-    await user.update({
-        password: newpassword
-    }, {
-        where: {
-            email: email
+        if (password !== confirmPassword) {
+            return res.status(400).send("Passwords do not match.");
         }
-    })
-    return res.redirect('/loginpage')
 
-}
+        // Find user by email 
+        //! update garne yo user ko information mati nai chan tei bata pass hane no needd to query into the data base every time 
+        const [data] = await user.findAll({ where: { email: email } });
+        if (!data) {
+            return res.status(404).send("User not found.");
+        }
 
+        const currentTime = Date.now();
+        const otpGeneratedTime = data.otpGeneratedTime;
+
+        // Check if OTP matches
+        const isOtpValid = await bcrypt.compare(otp, data?.otp);
+        if (!isOtpValid) {
+            return res.status(400).send("Invalid OTP.");
+        }
+
+        // Check if OTP has expired
+        if (currentTime - otpGeneratedTime > 2 * 60 * 1000) { // 2 minutes expiry
+            return res.status(400).send("OTP has expired.");
+        }
+
+        // Hash the new password and save
+        const newHashedPassword = await bcrypt.hash(password, 10);
+        data.password = newHashedPassword;
+        data.otp = null;
+        data.otpGeneratedTime = null;
+        await data.save();
+
+        return res.redirect('/loginpage');
+    } catch (error) {
+        console.error("Error changing password:", error);
+        return res.status(500).send("An error occurred while changing the password.");
+    }
+};

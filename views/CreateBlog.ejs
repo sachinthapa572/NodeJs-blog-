@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add post </title>
     <link rel="stylesheet" href="CreateBlog.css">
+    <%- include('./components/import') %>
+
 </head>
 
 <body>
@@ -37,9 +39,7 @@
             </form>
         </div>
 
-        <footer>
-            <p>&copy; 2024 Your Website. All Rights Reserved.</p>
-        </footer>
+        <%- include('./components/Footer') %>
 </body>
 
 <!-- Load TinyMCE from the static files you served -->

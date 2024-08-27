@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Your Website</title>
     <link rel="stylesheet" href="/login.css">
+    <%- include('./components/import') %>
+
 </head>
 
 <body>
@@ -14,13 +16,12 @@
         <main>
             <div class="login-container">
                 <h2>Login</h2>
-
-                <!-- Display error message if exists -->
-                <% if (typeof error !=='undefined' ) { %>
-                    <div class="error-message">
+                <% if(error){ %>
+                    <div id="error-message">
                         <%= error %>
                     </div>
                     <% } %>
+
 
                         <form action="/loginuser" method="POST">
                             <div class="form-group">
@@ -41,14 +42,15 @@
             </div>
         </main>
 
-        <footer>
-            <p>&copy; 2024 Your Website. All Rights Reserved.</p>
-        </footer>
+        <%- include('./components/Footer') %>
+
 </body>
 
+<script src="/error-handler.js"></script>
 <script>
-
-
+    window.onload = () => {
+        hideErrorMessage('error-message');
+    };
 </script>
 
 </html>

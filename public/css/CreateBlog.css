@@ -8,6 +8,7 @@ body {
 nav {
     background-color: #333;
     padding: 10px 20px;
+    margin-bottom: 20px;
 }
 
 nav ul {
@@ -89,12 +90,3 @@ button:hover {
     background-color: #555;
 }
 
-footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}

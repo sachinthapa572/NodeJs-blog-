@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Journey of Web Development - Your Website</title>
     <link rel="stylesheet" href="/singleblog.css">
+    <%- include('./components/import') %>
 </head>
 
 <body>
@@ -46,12 +47,10 @@
             </div>
 
         </main>
+        <%- include('./components/Footer') %>
 
-        <footer>
 
-            <% console.log("this is value" , currentUserId); %>
-                <p>&copy; 2024 Your Website. All Rights Reserved.</p>
-        </footer>
+
 </body>
 
 </html>

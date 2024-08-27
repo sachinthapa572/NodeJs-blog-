@@ -3,6 +3,8 @@ const cookieParser = require('cookie-parser');
 const blogRoute = require('./routes/blog.routes');
 const authRoute = require('./routes/auth.routes');
 const { jwtDecode } = require('./utils/decodeJwtToken');
+const session = require('express-session');
+const flash = require('connect-flash');
 require('dotenv').config();
 
 //! app creating 
@@ -19,8 +21,14 @@ require('./model/index');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//! Use the cookie-parser middleware
+//! Use the  middleware
 app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,              // if the session is not change then don't save the session
+  saveUninitialized: false,   // if the session is not initialize then don't save the session
+}));
+app.use(flash());
 
 // setting the global variable
 app.use(async (req, res, next) => {
@@ -45,6 +53,7 @@ app.use('', authRoute)
 
 //!  static file ko lagi
 app.use(express.static('public/css'));
+app.use(express.static('public/js'));
 app.use(express.static('public/images'));
 app.use(express.static('uploads/'));
 app.use(express.static('node_modules/tinymce/'));
