@@ -41,7 +41,7 @@
                     </div>
                     <div>
                         <% if (currentUserId) { %>
-                            <% if (currentUserId===data.id) { %>
+                            <% if (currentUserId===data?.userId) { %>
                                 <a href="/editpost/<%= data.id %>"><button>Update</button></a>
                                 <a href="/deletepost/<%= data.id %>"><button>Delete</button></a>
                                 <% } %>

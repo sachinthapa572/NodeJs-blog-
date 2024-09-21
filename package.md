@@ -6,3 +6,7 @@ multer == used to upload files
 flash == used to send messages to the user
 express-session == used to manage sessions
 nodemailer == used to send emails
+
+<!-- npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch -->
+
+ <!-- ! "start": "concurrently \"npm run server\" \"npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch\"", -->
