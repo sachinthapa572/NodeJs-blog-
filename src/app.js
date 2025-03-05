@@ -1,65 +1,61 @@
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const blogRoute = require('./routes/blog.routes');
-const authRoute = require('./routes/auth.routes');
-const { jwtDecode } = require('./utils/decodeJwtToken');
-const session = require('express-session');
-const flash = require('connect-flash');
-require('dotenv').config();
+import flash from "connect-flash";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+import express from "express";
+import session from "express-session";
+import { sessionOptions } from "./constant";
+import authRoute from "./routes/auth.routes";
+import blogRoute from "./routes/blog.routes";
+import { jwtDecode } from "./utils/decodeJwtToken";
+dotenv.config();
 
 //! app creating
 const app = express();
 
 //! ejs lai setup
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
 
-//! database connection
-require('./model/index');
-
-//! handel the form data or handel the incomming json payload (bodyparser ko alternative)
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-//! Use the  middleware
-app.use(cookieParser());
 app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false, // if the session is not change then don't save the session
-        saveUninitialized: false, // if the session is not initialize then don't save the session
-    })
+  express.json({
+    limit: "16kb",
+    strict: true,
+  }),
+  express.urlencoded({ extended: true, limit: "16kb" }),
+  cookieParser(),
+  session(sessionOptions),
+  cookieParser(),
+  flash()
 );
-app.use(flash());
 
 // setting the global variable
 app.use(async (req, res, next) => {
-    const token = req.cookies.token;
-    if (token) {
-        let decodedToken = await jwtDecode(token);
-        if (decodedToken && decodedToken?.id) {
-            res.locals.currentUserId = decodedToken?.id; // locals set the global variable
-        }
-    } else {
-        res.locals.currentUserId = null;
+  const token = req.cookies.token;
+  if (token) {
+    let decodedToken = await jwtDecode(token);
+    if (decodedToken && decodedToken?.id) {
+      res.locals.currentUserId = decodedToken?.id;
     }
-    res.locals.islogined = req.cookies.token || null;
-    res.locals.error = req.flash('error') || null;
-    next();
+  } else {
+    res.locals.currentUserId = null;
+  }
+  res.locals.islogined = req.cookies.token || null;
+  res.locals.error = req.flash("error") || null;
+  next();
 });
 
 //! setting of the routes
-app.use('', blogRoute); // localhost:3000/ + blogRoute
-// app.use('/test', blogRoute);  // localhost:3000/test + blogRoute
-app.use('', authRoute);
+app.use("", authRoute);
+app.use("", blogRoute);
 
 //!  static file ko lagi
-app.use(express.static('public/css'));
-app.use(express.static('public/js'));
-app.use(express.static('public/images'));
-app.use(express.static('uploads/'));
-app.use(express.static('node_modules/tinymce/'));
+app.use(express.static("public/css"));
+app.use(express.static("public/js"));
+app.use(express.static("public/images"));
+app.use(express.static("uploads/"));
+app.use(express.static("node_modules/tinymce/"));
 
 const PORT = process.env.PORT || 3001;
+
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

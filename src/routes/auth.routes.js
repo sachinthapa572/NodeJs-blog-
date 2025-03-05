@@ -1,16 +1,31 @@
-const router = require('express').Router();
-const { signupPage, signupUser, loginPage, loginUser, logoutUser, recoverPasswordPage, checkuser, handelOTP, changePasswordPage, changePassword } = require('../controller/auth/auth.controller');
-const catchError = require('../utils/catchError');
+import { Router } from "express";
+import {
+  changePassword,
+  changePasswordPage,
+  checkuser,
+  handelOTP,
+  loginPage,
+  loginUser,
+  logoutUser,
+  recoverPasswordPage,
+  signupPage,
+  signupUser,
+} from "../controller/auth/auth.controller";
+import catchError from "../utils/catchError";
 
+const userRouter = Router();
 
-router.route('/signuppage').get(signupPage).post(catchError(signupUser));
-router.route('/loginpage').get(loginPage).post(catchError(loginUser));
-router.route('/logout').get(catchError(logoutUser));
-router.route('/recover-password').get(catchError(recoverPasswordPage)).post(catchError(checkuser))
-router.route('/handel-otp/:id').post(catchError(handelOTP))
-router.route('/changePassword/:id').get(changePasswordPage).post(catchError(changePassword))
+userRouter.route("/signuppage").get(signupPage).post(catchError(signupUser));
+userRouter.route("/loginpage").get(loginPage).post(catchError(loginUser));
+userRouter.route("/logout").get(catchError(logoutUser));
+userRouter
+  .route("/recover-password")
+  .get(catchError(recoverPasswordPage))
+  .post(catchError(checkuser));
+userRouter.route("/handel-otp/:id").post(catchError(handelOTP));
+userRouter
+  .route("/changePassword/:id")
+  .get(changePasswordPage)
+  .post(catchError(changePassword));
 
-module.exports = router;
-
-
-// catchError() is the alternative of the try catch block and more easier to use 
+export default userRouter;

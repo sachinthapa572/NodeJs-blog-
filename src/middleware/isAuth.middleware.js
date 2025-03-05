@@ -1,53 +1,43 @@
-//* blogpost gar na vanda paila yo middleware le check garxa ki user login xa ki xaina ani login xa vane matra blog post garne natra login page ma redirect garxa (middelware vane ko inbetween process ho)
+import { PrismaClient } from "@prisma/client";
+import jwt from "jsonwebtoken";
+const prisma = new PrismaClient();
 
-const jwt = require('jsonwebtoken')
-const { promisify } = require('util');
-const { user } = require('../model');
-const { where } = require('sequelize');
-const { jwtDecode } = require('../utils/decodeJwtToken');
+export const isAuth = async (req, res, next) => {
+  const token = req.cookies.token;
 
-exports.isAuth = async (req, res, next) => {
+  // If no token, redirect to login
+  if (!token) {
+    return res.redirect("/loginpage");
+  }
 
-    const token = req.cookies.token;
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (!token)
-        return res.redirect('/loginpage')
+    // Check if the user exists in the database
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+    });
 
-    //! token verification 
-
-    // jwt.verify(token , process.env.JWT_SECRET , (err , decoded) => {
-    //     if(err)
-    //             res.send(err)
-    //     else{
-    //         // futher step
-    //     }
-
-    // })
-
-
-    // easier step use the promisify le aafai handel garcha tyo pacahdi ko kura le 
-    // const decodedResult = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
-    const decodedResult = await jwtDecode(token)
-
-
-    // check the user is present or not 
-    const userExist = await user.findAll({
-        where: {
-            id: decodedResult.id
-        }
-    })
-    // console.log(userExist[0].id);
-
-    if (userExist.length === 0) {
-        return res.redirect('/loginpage')
-    } else {
-        req.users = userExist[0].id
+    // If user doesn't exist, redirect to login
+    if (!user) {
+      return res.redirect("/loginpage");
     }
 
-    // console.log(userExist);
-    // Advantage of the middelware is that it can carry the data for the next component as req.[data]
-    next()
+    // Attach the user ID to the request object
+    req.users = user.id;
 
+    // Proceed to the next middleware/route handler
+    next();
+  } catch (error) {
+    console.error("Authentication error:", error);
 
+    // Handle specific JWT errors
+    if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
+      res.clearCookie("token");
+      return res.redirect("/loginpage");
+    }
 
-}
+    return res.status(500).redirect("/loginpage");
+  }
+};

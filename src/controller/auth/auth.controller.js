@@ -1,104 +1,124 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const otpGenerator = require('otp-generator');
-const { user } = require('../../model');
-const sendEmail = require('../../utils/nodeMailer');
-const { OTPlength } = require('../../constant');
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import otpGenerator from "otp-generator";
+import { OTPlength } from "../../constant";
+import sendEmail from "../../utils/nodeMailer";
 
-// signup page
-exports.signupPage = (req, res) => {
-  const error = req.flash('error');
-  return res.render('signup', {
-    error: error.length > 0 ? error : null,
-  });
+const prisma = new PrismaClient();
+
+// Helper function for handling errors and flash messages
+const handleError = (res, redirectPath, errorMessage, messageType = "error") => {
+  req.flash(messageType, errorMessage);
+  return res.redirect(redirectPath);
 };
 
-// signup user data
-exports.signupUser = async (req, res) => {
+// Signup page
+export const signupPage = (req, res) => {
+  const error = req.flash("error");
+  return res.render("signup", { error: error.length > 0 ? error : null });
+};
+
+// Signup user
+export const signupUser = async (req, res) => {
   const { username, email, password } = req.body;
-  if (!username || !email || !password || username.length < 2) {
-    return res.status(404).send('Please provide both username and password.');
+
+  try {
+    // Validation
+    if (!username || !email || !password || username.length < 2) {
+      return handleError(
+        res,
+        "/signuppage",
+        "Please provide valid username, email, and password."
+      );
+    }
+
+    // Check existing user
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return handleError(res, "/signuppage", "Email already exists.");
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    await prisma.user.create({
+      data: { username, email, password: hashedPassword },
+    });
+
+    req.flash("message", "Registration successful. Please login.");
+    res.redirect("/loginpage");
+  } catch (error) {
+    console.error("Signup error:", error);
+    handleError(res, "/signuppage", "An error occurred during registration.");
   }
-  // check if the email already exists or not
-  const [userExist] = await user.findAll({
-    where: { email },
-  });
-  if (userExist) {
-    req.flash('error', 'Email already exists.');
-    return res.redirect('/signuppage');
-  }
-  let newpassword = await bcrypt.hash(password, 10);
-  // Create new user
-  await user.create({
-    username,
-    email,
-    password: newpassword,
-  });
-  req.flash('message', 'Registration successful. Please login.');
-  res.redirect('/loginpage');
 };
 
-// login page
-exports.loginPage = (req, res) => {
-  const error = req.flash('error');
-  const message = req.flash('message');
-  return res.render('login', {
+// Login page
+export const loginPage = (req, res) => {
+  const error = req.flash("error");
+  const message = req.flash("message");
+  return res.render("login", {
     error: error.length > 0 ? error : null,
     message: message.length > 0 ? message : null,
   });
 };
 
-// login user
-
-exports.loginUser = async (req, res) => {
+// Login user
+export const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(404).send('Please provide both email and password.');
-  }
-  // Find the user by email
-  const [userExist] = await user.findAll({
-    where: { email },
-  });
-  if (!userExist) {
-    console.log('not exist ');
-    req.flash('error', 'User does not exist.');
-    return res.redirect('/loginpage');
-  }
 
-  // Validate password
-  const validPassword = await bcrypt.compare(password, userExist.password);
-  if (!validPassword) {
-    req.flash('error', 'Invalid password. Please try again.');
-    return res.redirect('/loginpage');
-  } else {
-    //! setting of the  jWT token
-    const token = jwt.sign({ id: userExist.id }, String(process.env.JWT_SECRET), {
-      expiresIn: '15d',
+  try {
+    // Validation
+    if (!email || !password) {
+      return handleError(res, "/loginpage", "Please provide both email and password.");
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return handleError(res, "/loginpage", "Invalid credentials.");
+    }
+
+    // Validate password
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return handleError(res, "/loginpage", "Invalid credentials.");
+    }
+
+    // Generate JWT
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "15d",
     });
-    //! this will set the cookie in the browser
-    res.cookie('token', token, {
-      // expires: new Date(Date.now() + 1 * 60 * 1000),
-      expires: new Date(Date.now() + 3600000), // cookie will be removed after 1 hour
+
+    // Set cookie
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 15 * 24 * 3600000), // 15 days
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
+
+    req.flash("message", "Login successful.");
+    res.redirect("/");
+  } catch (error) {
+    console.error("Login error:", error);
+    handleError(res, "/loginpage", "An error occurred during login.");
   }
-
-  // If login is successful, redirect to the homepage
-  req.flash('message', 'Login successful.');
-  res.redirect('/');
 };
 
-exports.logoutUser = (req, res) => {
-  res.clearCookie('token');
-  req.flash('message', 'Logged out successfully.');
-  res.redirect('/');
+// Logout
+export const logoutUser = (req, res) => {
+  res.clearCookie("token");
+  req.flash("message", "Logged out successfully.");
+  res.redirect("/");
 };
 
-//!  recover password section
-exports.recoverPasswordPage = (req, res) => {
-  const message = req.flash('message');
-  return res.render('auth/recoverPage', {
+// Password recovery page
+export const recoverPasswordPage = (req, res) => {
+  const message = req.flash("message");
+  return res.render("auth/recoverPage", {
     error: null,
     isotp: false,
     email: null,
@@ -106,157 +126,160 @@ exports.recoverPasswordPage = (req, res) => {
   });
 };
 
-exports.checkuser = async (req, res) => {
-  const email = req.body.email;
-  if (!email) {
-    return res.status(400).send('Please provide an email.');
-  }
+// Check user and send OTP
+export const checkuser = async (req, res) => {
+  const { email } = req.body;
 
-  const [userExist] = await user.findAll({
-    where: {
-      email: email,
-    },
-  });
+  try {
+    // Validate input
+    if (!email) return handleError(res, "/recover-password", "Please provide an email.");
 
-  if (!userExist) {
-    return res.render('auth/recoverPage', {
-      error: 'The user with that mail does not exit ',
-      isotp: false,
-      email: email,
-      message: null,
-    });
-  }
+    // Find user
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.render("auth/recoverPage", {
+        error: "User with this email does not exist",
+        isotp: false,
+        email,
+        message: null,
+      });
+    }
 
-  const generatedOTP = otpGenerator.generate(
-    OTPlength, // package bata generate gare ko
-    {
+    // Generate OTP
+    const generatedOTP = otpGenerator.generate(OTPlength, {
       lowerCaseAlphabets: false,
       upperCaseAlphabets: false,
       specialChars: false,
-    }
-  );
+    });
 
-  await sendEmail({
-    email: email,
-    subject: 'NodeBlog : Reset the Password ',
-    otp: generatedOTP,
-  });
+    // Send email
+    await sendEmail({
+      email,
+      subject: "Password Reset OTP",
+      otp: generatedOTP,
+    });
 
-  // update the otp and the otpGeneratedTime in the database
-  userExist.otp = await bcrypt.hash(generatedOTP, 10);
-  userExist.otpGeneratedTime = Date.now();
-  await userExist.save(); // save the update to the database
+    // Hash and save OTP
+    const hashedOTP = await bcrypt.hash(generatedOTP, 10);
+    await prisma.user.update({
+      where: { email },
+      data: {
+        otp: hashedOTP,
+        otpGeneratedTime: Date.now(),
+      },
+    });
 
-  return res.render(`auth/recoverPage`, {
-    error: null,
-    isotp: true,
-    email: email,
-    message: null,
-  });
-};
-
-exports.changePasswordPage = (req, res) => {
-  const email = req.params.id;
-  const otp = req.query.otp;
-  if (!email || !otp) return res.status(400).send('Please provide both email and OTP.');
-
-  return res.render('auth/changePassword', {
-    email,
-    otp,
-  });
-};
-
-exports.handelOTP = async (req, res) => {
-  const generatedOTP = req.body.otp;
-  const email = String(req.params.id);
-  if (!(generatedOTP || email)) return res.status(400).send('Enter the email or the Otp');
-  const [data] = await user.findAll({
-    where: {
-      email: email,
-    },
-  });
-  if (!data) {
-    req.flash('error', 'The user does not exist');
-    return res.redirect('/recover-password');
-  }
-  const isOtpValid = await bcrypt.compare(generatedOTP, data?.otp);
-  if (!isOtpValid) {
-    req.flash('error', 'The OTP does not match');
-    return res.redirect(`/recover-password`);
-  } else {
-    const currentTime = Date.now();
-    const otpGeneratedTime = data.otpGeneratedTime;
-
-    // check if the otp has been expired or not
-
-    if (currentTime - otpGeneratedTime > 2 * 60 * 1000) {
-      data.otp = null;
-      data.otpGeneratedTime = null;
-      await data.save();
-      req.flash('message', 'OTP has expired. Please try again.');
-      return res.redirect(`/recover-password`);
-    } else {
-      console.log('OTP has been verified');
-      return res.redirect(`/changePassword/${email}?otp=${generatedOTP}`);
-    }
-  }
-};
-
-exports.changePassword = async (req, res) => {
-  try {
-    const email = req.params.id;
-    const otp = req.query.otp;
-    const { password, confirmPassword } = req.body;
-
-    // Validate passwords
-    if (!password || !confirmPassword) {
-      req.flash('error', 'Please provide both password and confirmPassword.');
-      return res.redirect(`/changePassword/${email}?otp=${otp}`);
-    }
-    if (password !== confirmPassword) {
-      req.flash('error', 'Passwords do not match.');
-      return res.redirect(`/changePassword/${email}?otp=${otp}`);
-    }
-
-    // Find user by email
-    const [data] = await user.findAll({ where: { email } });
-    if (!data) {
-      req.flash('error', 'User not found.');
-      return res.redirect('/recover-password');
-    }
-
-    const currentTime = Date.now();
-    const otpGeneratedTime = data.otpGeneratedTime;
-
-    // Check if OTP matches
-    const isOtpValid = await bcrypt.compare(otp, data.otp);
-    if (!isOtpValid) {
-      req.flash('error', 'Invalid OTP.');
-      return res.redirect('/recover-password');
-    }
-
-    // Check if OTP has expired
-    if (currentTime - otpGeneratedTime > 2 * 60 * 1000) {
-      // 2 minutes expiry
-      data.otp = null;
-      data.otpGeneratedTime = null;
-      await data.save();
-      req.flash('error', 'OTP has expired. Please try again.');
-      return res.redirect('/recover-password');
-    }
-
-    // Hash the new password and save
-    const newHashedPassword = await bcrypt.hash(password, 10);
-    data.password = newHashedPassword;
-    data.otp = null;
-    data.otpGeneratedTime = null;
-    await data.save();
-
-    req.flash('message', 'Password changed successfully. Please login with your new password.');
-    return res.redirect('/loginpage');
+    return res.render("auth/recoverPage", {
+      error: null,
+      isotp: true,
+      email,
+      message: null,
+    });
   } catch (error) {
-    console.error('Error changing password:', error);
-    req.flash('error', 'An error occurred while changing the password. Please try again.');
-    return res.redirect('/recover-password');
+    console.error("OTP send error:", error);
+    handleError(res, "/recover-password", "Failed to send OTP. Please try again.");
+  }
+};
+
+// Handle OTP verification
+export const handelOTP = async (req, res) => {
+  const { email } = req.params;
+  const { otp } = req.body;
+
+  try {
+    if (!email || !otp) {
+      return handleError(res, "/recover-password", "Invalid request.");
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return handleError(res, "/recover-password", "User not found.");
+
+    // Verify OTP
+    const isValidOTP = await bcrypt.compare(otp, user.otp || "");
+    if (!isValidOTP) {
+      return handleError(res, "/recover-password", "Invalid OTP.");
+    }
+
+    // Check expiration (2 minutes)
+    if (Date.now() - user.otpGeneratedTime > 120000) {
+      await prisma.user.update({
+        where: { email },
+        data: { otp: null, otpGeneratedTime: null },
+      });
+      return handleError(res, "/recover-password", "OTP has expired.");
+    }
+
+    res.redirect(`/changePassword/${email}?otp=${otp}`);
+  } catch (error) {
+    console.error("OTP verification error:", error);
+    handleError(res, "/recover-password", "OTP verification failed.");
+  }
+};
+
+// Change password page
+export const changePasswordPage = (req, res) => {
+  const { id: email } = req.params;
+  const { otp } = req.query;
+  return res.render("auth/changePassword", { email, otp });
+};
+
+// Handle password change
+export const changePassword = async (req, res) => {
+  const { email } = req.params;
+  const { otp, password, confirmPassword } = req.body;
+
+  try {
+    // Validate inputs
+    if (!password || !confirmPassword) {
+      return handleError(
+        res,
+        `/changePassword/${email}?otp=${otp}`,
+        "Please fill all fields."
+      );
+    }
+
+    if (password !== confirmPassword) {
+      return handleError(
+        res,
+        `/changePassword/${email}?otp=${otp}`,
+        "Passwords do not match."
+      );
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return handleError(res, "/recover-password", "User not found.");
+
+    // Verify OTP
+    const isValidOTP = await bcrypt.compare(otp, user.otp || "");
+    if (!isValidOTP) {
+      return handleError(res, "/recover-password", "Invalid OTP.");
+    }
+
+    // Check expiration
+    if (Date.now() - user.otpGeneratedTime > 120000) {
+      await prisma.user.update({
+        where: { email },
+        data: { otp: null, otpGeneratedTime: null },
+      });
+      return handleError(res, "/recover-password", "OTP has expired.");
+    }
+
+    // Update password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await prisma.user.update({
+      where: { email },
+      data: {
+        password: hashedPassword,
+        otp: null,
+        otpGeneratedTime: null,
+      },
+    });
+
+    req.flash("message", "Password updated successfully. Please login.");
+    res.redirect("/loginpage");
+  } catch (error) {
+    console.error("Password change error:", error);
+    handleError(res, "/recover-password", "Failed to change password.");
   }
 };

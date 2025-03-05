@@ -1,21 +1,21 @@
 import { createTransport } from "nodemailer";
 
 const sendEmail = async (options) => {
-    try {
-        const transporter = createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.HOST_EMAIL,
-                pass: process.env.HOST_EMAIL_PASSWORD,
-            },
-        });
+  try {
+    const transporter = createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.HOST_EMAIL,
+        pass: process.env.HOST_EMAIL_PASSWORD,
+      },
+    });
 
-        // Define the email options with HTML content
-        const mailOptions = {
-            from: `${process.env.HOST_NAME} <${process.env.HOST_EMAIL}>`,
-            to: options.email,
-            subject: options.subject,
-            html: `
+    // Define the email options with HTML content
+    const mailOptions = {
+      from: `${process.env.HOST_NAME} <${process.env.HOST_EMAIL}>`,
+      to: options.email,
+      subject: options.subject,
+      html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
                     <div style="text-align: center; margin-bottom: 20px;">
                         <img src="cid:logo" alt="NodeBlog" style="max-width: 150px;"/>
@@ -41,22 +41,24 @@ const sendEmail = async (options) => {
                     </p>
                 </div>
             `,
-            attachments: [{
-                filename: 'logo.png',
-                path: "public\\images\\logo.png",
-                cid: 'logo' // same cid value as in the html img src
-            }]
-        };
+      attachments: [
+        {
+          filename: "logo.png",
+          path: "public\\images\\logo.png",
+          cid: "logo", // same cid value as in the html img src
+        },
+      ],
+    };
 
-        // Send the email
-        const info = await transporter.sendMail(mailOptions);
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
 
-        console.log(`Email sent successfully: ${info.messageId}`);
-        return info;
-    } catch (error) {
-        console.error(`Failed to send email: ${error.message}`);
-        throw new Error("Failed to send email. Please try again later.");
-    }
+    console.log(`Email sent successfully: ${info.messageId}`);
+    return info;
+  } catch (error) {
+    console.error(`Failed to send email: ${error.message}`);
+    throw new Error("Failed to send email. Please try again later.");
+  }
 };
 
 export default sendEmail;
