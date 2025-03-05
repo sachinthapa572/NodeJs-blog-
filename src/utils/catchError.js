@@ -4,10 +4,8 @@ module.exports = (fn) => {
             // console.log(req);
             const path = req.route.path
             req.flash('error', 'Something went wrong')
-            console.log(error)
             res.redirect(path)
             return
-
         })
     }
 

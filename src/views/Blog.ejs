@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple Website</title>
     <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="input.css">
     <%- include('./components/import') %>
         <style>
             .alert {
@@ -29,7 +30,7 @@
                     <div class="container">
                         <% if (data && data.length> 0) { %>
                             <% data.forEach(blog=> { %>
-                                <div class="card">
+                                <div class="card ">
                                     <h2 class="truncate">
                                         <%- blog.title %>
                                     </h2>
