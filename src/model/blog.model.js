@@ -1,5 +1,3 @@
-// creating the schema of the table using the sequilize
-
 module.exports = (sequelize, DataTypes) => {
   const Blog = sequelize.define('blog', {
     title: {
@@ -11,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     description: {
-      type: DataTypes.TEXT, // string le certian portion pachi faldincha(less bit store gar cha ) so text use gareko
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     image: {

@@ -1,8 +1,8 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const blogRoute = require('./routes/blog.routes');
-const authRoute = require('./routes/auth.routes');
-const { jwtDecode } = require('./utils/decodeJwtToken');
+const blogRoute = require('./src/routes/blog.routes');
+const authRoute = require('./src/routes/auth.routes');
+const { jwtDecode } = require('./src/utils/decodeJwtToken');
 const session = require('express-session');
 const flash = require('connect-flash');
 require('dotenv').config();
@@ -14,7 +14,7 @@ const app = express();
 app.set('view engine', 'ejs');
 
 //! database connection
-require('./model/index');
+require('./src/model/index');
 
 //! handel the form data or handel the incomming json payload (bodyparser ko alternative)
 app.use(express.json());

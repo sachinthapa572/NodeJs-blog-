@@ -217,5 +217,3 @@ exports.searchBlog = async (req, res) => {
     data,
   });
 };
-
-

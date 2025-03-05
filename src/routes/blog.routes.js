@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const { homePage, deletePost, addPost, singleBlog, createPost, editPost, updatePost, showMyBlog, testshow, uploads } = require('../controller/blog/blog.controller');
-const { isAuth } = require('../../middleware/isAuth.middleware');
+const { isAuth } = require('../middleware/isAuth.middleware');
 const catchError = require('../utils/catchError');
 // multer  config
-const { multer, storage } = require('../../middleware/multer.middleware');
+const { multer, storage } = require('../middleware/multer.middleware');
 const upload = multer({ storage: storage })
 
 

@@ -43,7 +43,7 @@ const sendEmail = async (options) => {
             `,
             attachments: [{
                 filename: 'logo.png',
-                path: "public\\images\\logo.png",
+                path: "src/public/images/logo.png",
                 cid: 'logo' // same cid value as in the html img src
             }]
         };
