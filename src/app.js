@@ -23,28 +23,28 @@ app.use(express.urlencoded({ extended: true }));
 //! Use the  middleware
 app.use(cookieParser());
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false, // if the session is not change then don't save the session
-    saveUninitialized: false, // if the session is not initialize then don't save the session
-  })
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false, // if the session is not change then don't save the session
+        saveUninitialized: false, // if the session is not initialize then don't save the session
+    })
 );
 app.use(flash());
 
 // setting the global variable
 app.use(async (req, res, next) => {
-  const token = req.cookies.token;
-  if (token) {
-    let decodedToken = await jwtDecode(token);
-    if (decodedToken && decodedToken?.id) {
-      res.locals.currentUserId = decodedToken?.id; // locals set the global variable
+    const token = req.cookies.token;
+    if (token) {
+        let decodedToken = await jwtDecode(token);
+        if (decodedToken && decodedToken?.id) {
+            res.locals.currentUserId = decodedToken?.id; // locals set the global variable
+        }
+    } else {
+        res.locals.currentUserId = null;
     }
-  } else {
-    res.locals.currentUserId = null;
-  }
-  res.locals.islogined = req.cookies.token || null;
-  res.locals.error = req.flash('error') || null;
-  next();
+    res.locals.islogined = req.cookies.token || null;
+    res.locals.error = req.flash('error') || null;
+    next();
 });
 
 //! setting of the routes
@@ -61,8 +61,5 @@ app.use(express.static('node_modules/tinymce/'));
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-// app.use() is the express middelware that run every time in the action
-// res.locals set the global variable so that it can be access from any where
