@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Posts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <%- include('./components/import') %>
+</head>
+
+<body class="bg-gradient-to-br from-gray-50 via-white to-gray-100 min-h-screen flex flex-col">
+    <%- include('./components/navbar') %>
+
+        <% if (message || error) { %>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-center"
+                id="error-msg">
+                <%- message || error %>
+            </div>
+            <% } %>
+
+                <main class="container mx-auto px-4 py-8 max-w-4xl flex-grow flex flex-col">
+                    <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">Latest Blog Posts</h1>
+
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 flex-grow">
+                        <% if (data && data.length> 0) { %>
+                            <% data.forEach(blog=> { %>
+                                <div
+                                    class="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-2xl">
+                                    <div class="p-6">
+                                        <h2 class="text-2xl font-semibold text-gray-800 mb-3 truncate">
+                                            <%- blog.title %>
+                                        </h2>
+                                        <h3 class="text-gray-600 mb-4 truncate">
+                                            <%- blog.subtitle %>
+                                        </h3>
+                                        <p class="text-sm text-gray-500 mb-4">
+                                            Owner: <%- blog.user.username %>
+                                        </p>
+                                        <a href="/blog/<%- blog.id %>"
+                                            class="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition duration-300">
+                                            Read More
+                                        </a>
+                                    </div>
+                                </div>
+                                <% }) %>
+                                    <% } else { %>
+                                        <p class="text-center text-gray-600 col-span-full">No blogs available.</p>
+                                        <% } %>
+                    </div>
+                </main>
+
+                <%- include('./components/Footer') %>
+</body>
+
+
+<script src="/error-handler.js"></script>
+<script>
+    window.onload = () => {
+        hideErrorMessage('error-msg');
+    };
+</script>
+
+</html>

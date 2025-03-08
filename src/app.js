@@ -3,10 +3,9 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import express from "express";
 import session from "express-session";
-import { sessionOptions } from "./constant";
-import authRoute from "./routes/auth.routes";
-import blogRoute from "./routes/blog.routes";
-import { jwtDecode } from "./utils/decodeJwtToken";
+import authRoute from "./routes/auth.routes.js";
+import blogRoute from "./routes/blog.routes.js";
+import { jwtDecode } from "./utils/decodeJwtToken.js";
 dotenv.config();
 
 //! app creating
@@ -22,7 +21,12 @@ app.use(
   }),
   express.urlencoded({ extended: true, limit: "16kb" }),
   cookieParser(),
-  session(sessionOptions),
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: process.env.NODE_ENV === "production" },
+  }),
   cookieParser(),
   flash()
 );

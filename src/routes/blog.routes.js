@@ -1,16 +1,17 @@
 import { Router } from "express";
 import {
   addPost,
+  createPost,
   deletePost,
   editPost,
   homePage,
   showMyBlog,
   singleBlog,
   updatePost,
-} from "../controller/blog/blog.controller";
-import { isAuth } from "../middleware/isAuth.middleware";
+} from "../controller/blog/blog.controller.js";
+import { isAuth } from "../middleware/isAuth.middleware.js";
 import { multer, storage } from "../middleware/multer.middleware.js";
-import catchError from "../utils/catchError";
+import catchError from "../utils/catchError.js";
 
 const blogRouter = Router();
 const upload = multer({ storage: storage });
@@ -18,7 +19,7 @@ const upload = multer({ storage: storage });
 blogRouter.route("/").get(catchError(homePage));
 blogRouter
   .route("/createblog")
-  //   .get(isAuth, catchError(createPost))
+  .get(isAuth, catchError(createPost))
   .post(isAuth, upload.single("image"), catchError(addPost));
 blogRouter.route("/blog/:id").get(singleBlog);
 blogRouter.route("/deletepost/:id").get(isAuth, catchError(deletePost));

@@ -44,38 +44,38 @@ model Blog {
   @@map("blog")
 }
 
-enum Subtitle {
-    en
-    es
-    fr
-    de
-    it
-    pt
-    ru
-    ja
-    zh
-    ar
-    hi
-    bn
-    pa
-    mr
-    te
-    ta
-    ur
-    gu
-    kn
-    ml
-    or
-    ne
-    si
-    fa
-    tl
-    tr
-    vi
-    ko
-    my
-    th
-    lo
-    ms
-    jv
-}
+// enum Subtitle {
+//     en
+//     es
+//     fr
+//     de
+//     it
+//     pt
+//     ru
+//     ja
+//     zh
+//     ar
+//     hi
+//     bn
+//     pa
+//     mr
+//     te
+//     ta
+//     ur
+//     gu
+//     kn
+//     ml
+//     or
+//     ne
+//     si
+//     fa
+//     tl
+//     tr
+//     vi
+//     ko
+//     my
+//     th
+//     lo
+//     ms
+//     jv
+// }

@@ -10,8 +10,8 @@ import {
   recoverPasswordPage,
   signupPage,
   signupUser,
-} from "../controller/auth/auth.controller";
-import catchError from "../utils/catchError";
+} from "../controller/auth/auth.controller.js";
+import catchError from "../utils/catchError.js";
 
 const userRouter = Router();
 

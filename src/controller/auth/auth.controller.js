@@ -2,8 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
-import { OTPlength } from "../../constant";
-import sendEmail from "../../utils/nodeMailer";
+import { OTPlength } from "../../constant.js";
+import sendEmail from "../../utils/nodeMailer.js";
 
 const prisma = new PrismaClient();
 
@@ -24,7 +24,7 @@ export const signupUser = async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // Validation
+    // Validation   
     if (!username || !email || !password || username.length < 2) {
       return handleError(
         res,
